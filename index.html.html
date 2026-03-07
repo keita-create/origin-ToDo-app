@@ -5,18 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ORIGIN Compass (Local Test)</title>
     
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- React & ReactDOM -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    
+    <!-- Babel -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-    <script type="importmap">
-    {
-      "imports": {
-        "react": "https://esm.sh/react@18.2.0",
-        "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
-        "lucide-react": "https://esm.sh/lucide-react@0.344.0?external=react"
-      }
-    }
-    </script>
+    <!-- Lucide (アイコンライブラリ) - umd版のlucideを使う -->
+    <script src="https://unpkg.com/lucide@0.344.0/dist/umd/lucide.js"></script>
+
     <style>
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: #f4f4f5; }
@@ -29,7 +30,7 @@
     <div id="root"></div>
 
     <script>
-        // PWA（スマホアプリ化）の機能を、1つのHTMLファイルだけで実現する魔法のコード
+        // PWA（スマホアプリ化）用の動的マニフェスト生成
         window.addEventListener('DOMContentLoaded', () => {
             const manifestData = {
                 "name": "ORIGIN Compass",
@@ -46,18 +47,14 @@
             const manifestBlob = new Blob([JSON.stringify(manifestData)], { type: 'application/json' });
             const manifestUrl = URL.createObjectURL(manifestBlob);
             
-            const manifestLink = document.getElementById('manifest-link');
-            if (manifestLink) {
-                manifestLink.href = manifestUrl;
-            } else {
-                const link = document.createElement('link');
-                link.id = 'manifest-link';
-                link.rel = 'manifest';
-                link.href = manifestUrl;
-                document.head.appendChild(link);
-            }
+            const link = document.createElement('link');
+            link.id = 'manifest-link';
+            link.rel = 'manifest';
+            link.href = manifestUrl;
+            document.head.appendChild(link);
         });
 
+        // Service Workerの設定
         if ('serviceWorker' in navigator) {
             const swCode = `
                 self.addEventListener('install', e => self.skipWaiting());
@@ -66,7 +63,6 @@
                     self.clients.claim();
                 });
                 self.addEventListener('fetch', e => {
-                    // キャッシュに頼らず、常にネットワークから最新のコードを取得する設定
                     e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
                 });
             `;
@@ -77,9 +73,64 @@
         }
     </script>
 
-   <script type="text/babel" data-presets="react">
+    <script type="text/babel" data-type="module">
+        const { useState, useEffect, useRef } = React;
         const { createRoot } = ReactDOM;
-       
+
+        // ★ lucide-reactの代わりに、LucideのSVGを直接Reactコンポーネント化する関数
+        const createIcon = (name) => {
+            return ({ size = 24, className = "", ...props }) => {
+                const iconNode = lucide.icons[name];
+                if (!iconNode) return null;
+                const [tag, attrs, children] = iconNode;
+                
+                const renderChildren = (kids) => {
+                  if (!kids) return null;
+                  return kids.map((kid, i) => {
+                    const [kTag, kAttrs, kChildren] = kid;
+                    const KTag = kTag;
+                    return <KTag key={i} {...kAttrs}>{renderChildren(kChildren)}</KTag>;
+                  });
+                };
+
+                return (
+                    <svg
+                        {...attrs}
+                        width={size}
+                        height={size}
+                        className={`lucide lucide-${name} ${className}`}
+                        {...props}
+                    >
+                        {renderChildren(children)}
+                    </svg>
+                );
+            };
+        };
+
+        // 必要なアイコンを生成
+        const Users = createIcon('users');
+        const CheckSquare = createIcon('check-square');
+        const Settings = createIcon('settings');
+        const LogOut = createIcon('log-out');
+        const Video = createIcon('video');
+        const Edit3 = createIcon('edit-3');
+        const CheckCircle = createIcon('check-circle');
+        const AlertCircle = createIcon('alert-circle');
+        const ChevronRight = createIcon('chevron-right');
+        const PlayCircle = createIcon('play-circle');
+        const MessageSquare = createIcon('message-square');
+        const Play = createIcon('play');
+        const X = createIcon('x');
+        const ExternalLink = createIcon('external-link');
+        const ShieldCheck = createIcon('shield-check');
+        const Award = createIcon('award');
+        const Eye = createIcon('eye');
+        const EyeOff = createIcon('eye-off');
+        const Camera = createIcon('camera');
+        const Menu = createIcon('menu');
+        const RefreshCw = createIcon('refresh-cw');
+
+
         // =========================================================
         // ★ ローカルストレージ（ブラウザの保存領域）を使うための関数
         // =========================================================
@@ -96,7 +147,6 @@
         const MILESTONE_TASKS = ['初めてのアポを取る', '初めての受注をする', '2件目のアポを取る', '2件目の受注をする', '3件目 受注する', '4件目 受注する（料金説明までやる）', 'アポインター 卒業する'];
 
         function App() {
-          // --- State 管理 (すべてブラウザ内に保存されます) ---
           const [allProfiles, setAllProfiles] = useState(() => loadData('compass_profiles', []));
           const [phases, setPhases] = useState(() => loadData('compass_phases', []));
           const [tasks, setTasks] = useState(() => loadData('compass_tasks', []));
@@ -110,7 +160,6 @@
           const [activeTargetUser, setActiveTargetUser] = useState(null);
           const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-          // --- 初期ロード ---
           useEffect(() => {
             const sid = localStorage.getItem('compass_profile_id');
             if (sid) {
@@ -125,7 +174,6 @@
             setLoading(false);
           }, []);
 
-          // --- データ更新関数 ---
           const updateProfile = (id, data) => {
             const updated = allProfiles.map(p => p.id === id ? { ...p, ...data } : p);
             setAllProfiles(updated); saveData('compass_profiles', updated);
@@ -237,14 +285,12 @@
             if (window.confirm("現在のタスクを全て削除し、本来の全39タスクに初期化しますか？\n※ユーザーの進捗は保持されます。")) {
               setPhases([]); saveData('compass_phases', []);
               setTasks([]); saveData('compass_tasks', []);
-              // 状態クリア後にシードデータを生成する
               setTimeout(() => {
                 handleSeedData();
               }, 100);
             }
           };
 
-          // タスク管理関数
           const addPhase = (name) => {
             const updated = [...phases, { id: genId(), name, order: phases.length + 1 }];
             setPhases(updated); saveData('compass_phases', updated);
@@ -268,7 +314,6 @@
             setTasks(updated); saveData('compass_tasks', updated);
           };
 
-          // ユーザー進捗管理関数
           const addUserTask = (data) => {
             const updated = [...userTasks, { id: genId(), ...data }];
             setUserTasks(updated); saveData('compass_userTasks', updated);
@@ -278,7 +323,6 @@
             setUserTasks(updated); saveData('compass_userTasks', updated);
           };
 
-          // 設定管理
           const updateSettings = (data) => {
             const updated = { ...settings, ...data };
             setSettings(updated); saveData('compass_settings', updated);
@@ -291,7 +335,6 @@
 
           return (
             <div className="min-h-screen flex flex-col md:flex-row animate-in">
-              {/* Desktop Nav */}
               <nav className="hidden md:flex w-64 flex-col bg-white border-r border-zinc-200 p-5 shadow-sm">
                 <h1 className="text-2xl font-black mb-10 tracking-tighter">ORIGIN<span className="text-zinc-400 text-sm ml-1 uppercase">Compass</span></h1>
                 <div className="flex-1 space-y-2">
@@ -299,7 +342,6 @@
                   {userProfile.role === 'admin' && <NavItem icon={<Settings size={18}/>} label="管理設定" active={view==='manage'} onClick={()=>setView('manage')} />}
                 </div>
                 <div className="mt-auto p-4 bg-zinc-50 rounded-2xl border border-zinc-100 flex flex-col gap-2">
-                   {/* 管理者のみ「最新版に更新」ボタンを表示 */}
                    {userProfile.role === 'admin' && (
                      <button onClick={() => window.location.reload()} className="w-full flex items-center justify-center gap-2 p-2 rounded-xl text-xs font-bold text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900 transition-colors">
                        <RefreshCw size={14}/> 最新版に更新
@@ -317,21 +359,18 @@
                 </div>
               </nav>
 
-              {/* Mobile Header */}
               <div className="md:hidden bg-white border-b border-zinc-200 p-4 flex items-center justify-between sticky top-0 z-30">
                 <h1 className="text-xl font-black tracking-tighter">ORIGIN <span className="text-zinc-400 text-xs">COMPASS</span></h1>
                 <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="p-2 text-zinc-600"><Menu size={24} /></button>
               </div>
 
-              {/* Mobile Menu */}
               {mobileMenuOpen && (
-                <div className="md:hidden fixed inset-0 bg-white z-40 p-6 animate-in">
+                <div className="md:hidden fixed inset-0 bg-white z-40 p-6 animate-in z-50">
                   <div className="flex justify-between items-center mb-8"><h1 className="text-xl font-black">Menu</h1><button onClick={() => setMobileMenuOpen(false)}><X size={24} /></button></div>
                   <div className="space-y-4">
                     <button onClick={() => { setView('dashboard'); setMobileMenuOpen(false); }} className={`w-full flex items-center gap-3 p-4 rounded-xl font-bold ${view==='dashboard'?'bg-zinc-900 text-white':'bg-zinc-50'}`}><Users size={20}/> ダッシュボード</button>
                     {userProfile.role === 'admin' && <button onClick={() => { setView('manage'); setMobileMenuOpen(false); }} className={`w-full flex items-center gap-3 p-4 rounded-xl font-bold ${view==='manage'?'bg-zinc-900 text-white':'bg-zinc-50'}`}><Settings size={20}/> 管理設定</button>}
                     <div className="pt-8 mt-8 border-t border-zinc-100 space-y-4">
-                      {/* 管理者のみ「最新版に更新」ボタンを表示 */}
                       {userProfile.role === 'admin' && (
                         <button onClick={() => window.location.reload()} className="w-full flex items-center gap-3 p-4 rounded-xl font-bold text-zinc-600 bg-zinc-100"><RefreshCw size={20}/> 最新版に更新</button>
                       )}
@@ -811,7 +850,4 @@
         reactRoot.render(<App />);
     </script>
 </body>
-
 </html>
-
-
