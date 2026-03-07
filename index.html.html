@@ -79,7 +79,7 @@
 
         // ★ lucide-reactの代わりに、LucideのSVGを直接Reactコンポーネント化する関数
         const createIcon = (name) => {
-            return ({ size = 24, className = "", ...props }) => {
+            return React.forwardRef(({ size = 24, className = "", ...props }, ref) => {
                 const iconNode = lucide.icons[name];
                 if (!iconNode) return null;
                 const [tag, attrs, children] = iconNode;
@@ -95,6 +95,7 @@
 
                 return (
                     <svg
+                        ref={ref}
                         {...attrs}
                         width={size}
                         height={size}
@@ -104,7 +105,7 @@
                         {renderChildren(children)}
                     </svg>
                 );
-            };
+            });
         };
 
         // 必要なアイコンを生成
