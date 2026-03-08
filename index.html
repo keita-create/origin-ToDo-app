@@ -184,25 +184,42 @@
         .modal-overlay { position: fixed; inset: 0; background: rgba(24, 24, 27, 0.6); backdrop-filter: blur(4px); z-index: 50; display: flex; align-items: center; justify-content: center; padding: 1.5rem; }
         .modal-content { background: var(--bg-white); width: 100%; max-width: 24rem; border-radius: 2rem; padding: 2rem; box-shadow: var(--shadow-xl); text-align: center; animation: fadeIn 0.2s ease-out; }
     </style>
+    
+    <!-- Firebase SDK (CDN) - HTMLだけでFirestoreを使うための公式スクリプト -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
 </head>
 <body>
-    <div id="app" class="app-layout"></div>
+    <div id="app" class="app-layout">
+        <!-- 初期ロード画面 -->
+        <div class="min-h-screen w-full flex items-center justify-center bg-zinc-50">
+            <div style="width: 2rem; height: 2rem; border: 3px solid #18181b; border-bottom-color: transparent; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+            <style>@keyframes spin { 100% { transform: rotate(360deg); } }</style>
+        </div>
+    </div>
     <div id="modal-root"></div>
 
     <script>
         // ==========================================
-        // 1. アプリの起動処理
+        // 1. Firebase 初期化
         // ==========================================
-        // GitHub Pages等のCSPセキュリティ制限でブロックされないように、
-        // 外部スクリプト(ServiceWorker)の動的生成を排除し、安全に初期化します。
-        window.addEventListener('DOMContentLoaded', () => {
-            try {
-                init();
-            } catch (e) {
-                console.error("App initialization failed:", e);
-                document.body.innerHTML = '<div style="padding: 2rem; text-align: center;"><h2 style="color: red; font-family: sans-serif;">起動エラーが発生しました</h2><p style="font-family: sans-serif; color: #555;">ブラウザのデータが破損している可能性があります。</p><button onclick="localStorage.clear(); window.location.reload();" style="padding: 10px 20px; margin-top: 20px; background: #18181b; color: white; border: none; border-radius: 8px; cursor: pointer;">データをリセットして再起動</button></div>';
+        let db, auth, appId;
+        const TENANT_ID = "origin_tenant_html_v1"; // 他のテストデータと混ざらないように独自のID
+        
+        try {
+            // ※重要: 環境変数から設定を読み込む（Canvas環境が提供する設定）
+            const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+            appId = typeof __app_id !== 'undefined' ? __app_id : 'origin-compass-html';
+            
+            if (Object.keys(firebaseConfig).length > 0) {
+                firebase.initializeApp(firebaseConfig);
+                auth = firebase.auth();
+                db = firebase.firestore();
             }
-        });
+        } catch (e) {
+            console.error("Firebase init error", e);
+        }
 
         // ==========================================
         // 2. アイコンデータ
@@ -242,20 +259,14 @@
         const genId = () => 'id_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
         const getTodayStr = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; };
         
-        const load = (key, def) => { 
-            try { const d = localStorage.getItem(key); return d ? JSON.parse(d) : def; } 
-            catch(e) { return def; }
-        };
-        const save = (key, data) => { try { localStorage.setItem(key, JSON.stringify(data)); } catch(e) {} };
-
         const MILESTONE_TASKS = ['初めてのアポを取る', '初めての受注をする', '2件目のアポを取る', '2件目の受注をする', '3件目 受注する', '4件目 受注する（料金説明までやる）', 'アポインター 卒業する'];
 
         let state = {
-            profiles: load('origin_profiles', []) || [],
-            phases: load('origin_phases', []) || [],
-            tasks: load('origin_tasks', []) || [],
-            userTasks: load('origin_userTasks', []) || [],
-            settings: load('origin_settings', { adminSecretKey: 'origin2026' }) || { adminSecretKey: 'origin2026' },
+            profiles: [],
+            phases: [],
+            tasks: [],
+            userTasks: [],
+            settings: { adminSecretKey: 'origin2026' },
             currentUser: null,
             view: 'dashboard',
             activeTask: null,
@@ -291,27 +302,125 @@
             // Modals
             confirm: null,
             alert: null,
+            isLoading: true // 初期データ読み込み中
         };
 
-        // 初期ロード
-        const sid = load('origin_current_id', null);
-        if (sid) {
-            state.currentUser = state.profiles.find(p => p.id === sid);
-            if(state.currentUser) {
-                state.currentUser.lastActiveAt = Date.now();
-                save('origin_profiles', state.profiles);
+        // Firebaseのリアルタイムリスナーの解除関数を保持
+        let unsubProfiles, unsubPhases, unsubTasks, unsubUserTasks;
+
+        // Firebaseが使えない環境（ローカル実行時など）のための代替処理
+        const loadLocal = (key, def) => { try { const d = localStorage.getItem(key); return d ? JSON.parse(d) : def; } catch(e) { return def; } };
+        const saveLocal = (key, data) => { try { localStorage.setItem(key, JSON.stringify(data)); } catch(e) {} };
+
+        function setupRealtimeListeners() {
+            if (!db) {
+                // Firebaseがない場合はローカルストレージを使用（予備）
+                state.profiles = loadLocal('origin_profiles', []);
+                state.phases = loadLocal('origin_phases', []);
+                state.tasks = loadLocal('origin_tasks', []);
+                state.userTasks = loadLocal('origin_userTasks', []);
+                state.settings = loadLocal('origin_settings', { adminSecretKey: 'origin2026' });
+                const sid = loadLocal('origin_current_id', null);
+                if (sid) {
+                    state.currentUser = state.profiles.find(p => p.id === sid);
+                    if(state.currentUser) {
+                        state.currentUser.lastActiveAt = Date.now();
+                        saveLocal('origin_profiles', state.profiles);
+                    }
+                }
+                state.isLoading = false;
+                render();
+                return;
             }
+
+            const publicDataPath = `artifacts/${appId}/public/data`;
+            
+            // Profiles Listener
+            unsubProfiles = db.collection(`${publicDataPath}/profiles`)
+                .where('tenantId', '==', TENANT_ID)
+                .onSnapshot(snap => {
+                    state.profiles = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    // 現在のユーザー情報を更新
+                    if (state.currentUser) {
+                        const updatedUser = state.profiles.find(p => p.id === state.currentUser.id);
+                        if (updatedUser) {
+                            state.currentUser = updatedUser;
+                        } else {
+                            // 削除されていた場合ログアウト
+                            handleGlobalClick({target: {closest: () => ({getAttribute: () => 'logout'})}});
+                        }
+                    }
+                    render();
+                }, e => console.error("Profiles listener error:", e));
+
+            // Phases Listener
+            unsubPhases = db.collection(`${publicDataPath}/phases`)
+                .where('tenantId', '==', TENANT_ID)
+                .onSnapshot(snap => {
+                    const data = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    state.phases = data.sort((a, b) => a.order - b.order);
+                    render();
+                }, e => console.error("Phases listener error:", e));
+
+            // Tasks Listener
+            unsubTasks = db.collection(`${publicDataPath}/tasks`)
+                .where('tenantId', '==', TENANT_ID)
+                .onSnapshot(snap => {
+                    const data = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    state.tasks = data.sort((a, b) => a.order - b.order);
+                    render();
+                }, e => console.error("Tasks listener error:", e));
+
+            // UserTasks Listener
+            unsubUserTasks = db.collection(`${publicDataPath}/userTasks`)
+                .where('tenantId', '==', TENANT_ID)
+                .onSnapshot(snap => {
+                    state.userTasks = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    render();
+                }, e => console.error("UserTasks listener error:", e));
         }
 
         // ==========================================
-        // 4. アプリケーションロジック
+        // 4. アプリケーションロジック (Firebase対応)
         // ==========================================
         function showAlert(msg) { state.alert = msg; render(); }
         function showConfirm(msg, onConfirm) { state.confirm = { msg, onConfirm }; render(); }
         function closeModals() { state.alert = null; state.confirm = null; render(); }
 
-        // ★ 完全な39タスクのデータを復元
-        function seedData(append = false) {
+        // Firebaseへの保存ラッパー
+        async function saveDataToDb(collectionName, data, docId = null) {
+            if (!db) {
+                // ローカルフォールバック
+                if(collectionName==='profiles') { state.profiles = data; saveLocal('origin_profiles', data); }
+                if(collectionName==='phases') { state.phases = data; saveLocal('origin_phases', data); }
+                if(collectionName==='tasks') { state.tasks = data; saveLocal('origin_tasks', data); }
+                if(collectionName==='userTasks') { state.userTasks = data; saveLocal('origin_userTasks', data); }
+                return;
+            }
+
+            try {
+                const path = `artifacts/${appId}/public/data/${collectionName}`;
+                if (docId) {
+                    await db.collection(path).doc(docId).set({ ...data, tenantId: TENANT_ID }, { merge: true });
+                } else {
+                    await db.collection(path).add({ ...data, tenantId: TENANT_ID });
+                }
+            } catch (e) {
+                console.error(`Save error for ${collectionName}:`, e);
+                showAlert("データの保存に失敗しました。");
+            }
+        }
+
+        async function deleteDataFromDb(collectionName, docId) {
+            if (!db) return; // ローカル時の処理は省略（状態更新で対応）
+            try {
+                await db.collection(`artifacts/${appId}/public/data/${collectionName}`).doc(docId).delete();
+            } catch (e) {
+                console.error(`Delete error for ${collectionName}:`, e);
+            }
+        }
+
+        async function seedData(append = false) {
             const pData = [
               {
                 name: 'フェーズ1: 入社準備と基礎インプット',
@@ -375,30 +484,49 @@
               }
             ];
             
-            let newPh = append ? [...state.phases] : [];
-            let newTk = append ? [...state.tasks] : [];
-            const maxOrder = newPh.length > 0 ? Math.max(...newPh.map(p => p.order)) : 0;
+            const maxOrder = state.phases.length > 0 ? Math.max(...state.phases.map(p => p.order)) : 0;
 
-            pData.forEach((p, i) => {
-                const pid = genId();
-                newPh.push({ id: pid, name: p.name, order: maxOrder + i + 1 });
-                p.tasks.forEach((t, j) => { newTk.push({ id: genId(), phaseId: pid, order: j+1, ...t }); });
-            });
-            state.phases = newPh; save('origin_phases', state.phases);
-            state.tasks = newTk; save('origin_tasks', state.tasks);
-            render();
+            if(db) {
+               for (let i = 0; i < pData.length; i++) {
+                  const p = pData[i];
+                  const phaseDoc = await db.collection(`artifacts/${appId}/public/data/phases`).add({ tenantId: TENANT_ID, name: p.name, order: maxOrder + i + 1 });
+                  for (let j = 0; j < p.tasks.length; j++) {
+                     const t = p.tasks[j];
+                     await db.collection(`artifacts/${appId}/public/data/tasks`).add({ tenantId: TENANT_ID, phaseId: phaseDoc.id, order: j + 1, ...t });
+                  }
+               }
+               showAlert("初期データを生成しました。");
+            } else {
+               let newPh = append ? [...state.phases] : [];
+               let newTk = append ? [...state.tasks] : [];
+               pData.forEach((p, i) => {
+                   const pid = genId();
+                   newPh.push({ id: pid, name: p.name, order: maxOrder + i + 1 });
+                   p.tasks.forEach((t, j) => { newTk.push({ id: genId(), phaseId: pid, order: j+1, ...t }); });
+               });
+               saveDataToDb('phases', newPh);
+               saveDataToDb('tasks', newTk);
+               render();
+            }
         }
 
-        function handleStartWork() {
+        async function handleStartWork() {
             if(!state.currentUser) return;
             if(state.currentUser.lastWorkDate === getTodayStr()) return;
-            state.currentUser.lastWorkDate = getTodayStr();
-            state.currentUser.workDays = (state.currentUser.workDays || 0) + 1;
-            save('origin_profiles', state.profiles);
-            render();
+            
+            const newWorkDays = (state.currentUser.workDays || 0) + 1;
+            
+            if(db) {
+                await saveDataToDb('profiles', { lastWorkDate: getTodayStr(), workDays: newWorkDays }, state.currentUser.id);
+            } else {
+                state.currentUser.lastWorkDate = getTodayStr();
+                state.currentUser.workDays = newWorkDays;
+                saveDataToDb('profiles', state.profiles);
+                render();
+            }
         }
 
-        function completeTask(taskId, extra = {}) {
+        async function completeTask(taskId, extra = {}) {
             if(!state.currentUser) return;
             const existing = state.userTasks.find(u => u.taskId === taskId && u.userId === state.currentUser.id);
             const tk = state.tasks.find(t=>t.id===taskId);
@@ -412,10 +540,18 @@
                 ...extra 
             };
             
-            if(existing) { Object.assign(existing, data); } 
-            else { state.userTasks.push({ id: genId(), ...data }); }
+            if(db) {
+                if(existing) {
+                    await saveDataToDb('userTasks', data, existing.id);
+                } else {
+                    await saveDataToDb('userTasks', data);
+                }
+            } else {
+                if(existing) { Object.assign(existing, data); } 
+                else { state.userTasks.push({ id: genId(), ...data }); }
+                saveDataToDb('userTasks', state.userTasks);
+            }
             
-            save('origin_userTasks', state.userTasks);
             state.view = 'dashboard';
             state.activeTask = null;
             render();
@@ -505,8 +641,7 @@
                   ${isAdmin ? `<button data-action="nav" data-view="manage" class="nav-item ${v==='manage'?'active':''}">${icon('settings',18)} 管理設定</button>` : ''}
                 </div>
                 <div class="mt-auto bg-zinc-50 p-4 rounded-2xl border border-zinc-200">
-                   ${isAdmin ? `<button data-action="reload" class="w-full flex justify-center items-center gap-2 p-2 mb-2 text-xs font-bold text-zinc-500 hover:text-zinc-900 transition-colors">${icon('refreshCw', 14)} 最新版に更新</button>` : ''}
-                   <div class="flex items-center justify-between ${isAdmin?'pt-3 border-t border-zinc-200':''}">
+                   <div class="flex items-center justify-between">
                      <div class="flex items-center gap-3 overflow-hidden">
                        <div class="w-10 h-10 rounded-full bg-zinc-900 flex items-center justify-center text-white font-bold shrink-0 overflow-hidden">
                           ${state.currentUser?.avatarUrl ? `<img src="${state.currentUser.avatarUrl}" class="w-full h-full object-cover"/>` : (state.currentUser?.name?.[0] || '?')}
@@ -531,7 +666,6 @@
                     ${isAdmin ? `<button data-action="nav" data-view="manage" class="nav-item ${v==='manage'?'active':''}">${icon('settings',20)} 管理設定</button>` : ''}
                  </div>
                  <div class="pt-6 border-t border-zinc-200 space-y-3">
-                    ${isAdmin ? `<button data-action="reload" class="btn-primary" style="background:var(--zinc-100);color:var(--zinc-900)">${icon('refreshCw',20)} 最新版に更新</button>` : ''}
                     <button data-action="logout" class="btn-primary" style="background:var(--red-50);color:var(--red-600)">${icon('logOut',20)} ログアウト</button>
                  </div>
               </div>` : ''}
@@ -1073,6 +1207,10 @@
         function render() {
             try {
                 const appRoot = document.getElementById('app');
+                if (state.isLoading) {
+                    // ローディング中は変更しない
+                    return;
+                }
                 if (state.currentUser) {
                     appRoot.innerHTML = renderMainApp();
                 } else {
@@ -1082,13 +1220,6 @@
                 setTimeout(setupVideoPlayer, 0);
             } catch(e) {
                 console.error("Rendering error:", e);
-                document.getElementById('app').innerHTML = `
-                  <div style="padding: 2rem; text-align: center;">
-                    <h2 style="color: red; font-weight: bold; margin-bottom: 1rem;">表示エラーが発生しました</h2>
-                    <p>ブラウザのキャッシュを削除するか、シークレットモードでお試しください。</p>
-                    <button onclick="localStorage.clear(); window.location.reload();" style="margin-top: 1rem; padding: 10px 20px; background: #18181b; color: white; border-radius: 8px;">データをリセットして再起動</button>
-                  </div>
-                `;
             }
         }
 
@@ -1096,7 +1227,7 @@
             document.addEventListener('input', handleGlobalInput);
             document.addEventListener('change', handleGlobalChange);
             document.addEventListener('click', handleGlobalClick);
-            render();
+            setupRealtimeListeners();
         }
 
         // ==========================================
@@ -1146,7 +1277,7 @@
             }
         }
 
-        function handleGlobalClick(e) {
+        async function handleGlobalClick(e) {
             const btn = e.target.closest('[data-action]');
             if (!btn) return;
             const action = btn.getAttribute('data-action');
@@ -1172,17 +1303,29 @@
                     if(state.profiles.some(p=>p.name === state.authName)) {
                         state.authError = 'その名前は既に存在します'; render(); return;
                     }
-                    const newId = genId();
-                    const newP = { id: newId, name: state.authName, password: state.authPass, role: state.authRole, avatarUrl: state.authAvatarUrl, lastActiveAt: Date.now(), createdAt: Date.now(), workDays: 0 };
-                    state.profiles.push(newP); save('origin_profiles', state.profiles);
+                    const newId = "user_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
+                    const newP = { name: state.authName, password: state.authPass, role: state.authRole, avatarUrl: state.authAvatarUrl, lastActiveAt: Date.now(), createdAt: Date.now(), workDays: 0 };
+                    
+                    if(db) {
+                        await saveDataToDb('profiles', newP, newId);
+                    } else {
+                        state.profiles.push({ id: newId, ...newP });
+                        saveLocal('origin_profiles', state.profiles);
+                    }
+
                     localStorage.setItem('origin_current_id', newId);
-                    state.currentUser = newP;
+                    state.currentUser = { id: newId, ...newP };
                     if(state.authRole==='admin' && state.phases.length===0) seedData();
                     render();
                 } else {
                     const match = state.profiles.find(p=>p.name===state.authName && p.password===state.authPass);
                     if(match) {
-                        match.lastActiveAt = Date.now(); save('origin_profiles', state.profiles);
+                        match.lastActiveAt = Date.now();
+                        if(db) {
+                            await saveDataToDb('profiles', { lastActiveAt: match.lastActiveAt }, match.id);
+                        } else {
+                            saveLocal('origin_profiles', state.profiles);
+                        }
                         localStorage.setItem('origin_current_id', match.id);
                         state.currentUser = match; render();
                     } else { state.authError = '氏名かパスワードが違います'; render(); }
@@ -1246,10 +1389,14 @@
                 const inp = document.getElementById(`feedback_${btn.dataset.utid}`);
                 const ut = state.userTasks.find(x=>x.id===btn.dataset.utid);
                 if(ut) {
-                    ut.adminComment = inp.value || '確認しました';
-                    ut.isCompleted = true;
-                    save('origin_userTasks', state.userTasks);
-                    render();
+                    if(db) {
+                        await saveDataToDb('userTasks', { adminComment: inp.value || '確認しました', isCompleted: true }, ut.id);
+                    } else {
+                        ut.adminComment = inp.value || '確認しました';
+                        ut.isCompleted = true;
+                        saveLocal('origin_userTasks', state.userTasks);
+                        render();
+                    }
                 }
             }
 
@@ -1261,29 +1408,51 @@
                 });
             }
             if (action === 'reset-seed-data') {
-                showConfirm("現在のタスクを全て削除し、全39タスクに初期化しますか？\n※ユーザーの進捗は保持されます。", () => {
-                    state.phases = []; state.tasks = [];
-                    save('origin_phases', []); save('origin_tasks', []);
+                showConfirm("現在のタスクを全て削除し、全39タスクに初期化しますか？\n※ユーザーの進捗は保持されます。", async () => {
+                    if(db) {
+                        // DB内の古いデータを削除するロジック（簡易版：全消去は面倒なので上書きを推奨するか、ループで消す）
+                        // ここでは簡単にローカル配列をクリアしてSeedを走らせる
+                        for(const p of state.phases) await deleteDataFromDb('phases', p.id);
+                        for(const t of state.tasks) await deleteDataFromDb('tasks', t.id);
+                    } else {
+                        state.phases = []; state.tasks = [];
+                        saveLocal('origin_phases', []); saveLocal('origin_tasks', []);
+                    }
                     seedData();
                 });
             }
             if (action === 'update-secret') {
-                state.settings.adminSecretKey = state.newSecretKey;
-                save('origin_settings', state.settings);
+                if(db) {
+                     await saveDataToDb('settings', { adminSecretKey: state.newSecretKey }, 'global');
+                } else {
+                    state.settings.adminSecretKey = state.newSecretKey;
+                    saveLocal('origin_settings', state.settings);
+                }
                 showAlert('✅ 管理者シークレットキーを更新しました！');
             }
             if (action === 'add-phase') {
                 if(state.newPhaseName) {
-                    state.phases.push({ id: genId(), name: state.newPhaseName, order: state.phases.length+1 });
-                    save('origin_phases', state.phases);
+                    const maxOrder = state.phases.length > 0 ? Math.max(...state.phases.map(p => p.order)) : 0;
+                    if(db) {
+                        await saveDataToDb('phases', { name: state.newPhaseName, order: maxOrder + 1 });
+                    } else {
+                        state.phases.push({ id: genId(), name: state.newPhaseName, order: maxOrder + 1 });
+                        saveLocal('origin_phases', state.phases);
+                    }
                     state.newPhaseName = ''; render();
                 }
             }
             if (action === 'delete-phase') {
-                showConfirm("フェーズとその中の全タスクを削除しますか？", () => {
-                    state.phases = state.phases.filter(p=>p.id!==btn.dataset.pid); save('origin_phases', state.phases);
-                    state.tasks = state.tasks.filter(t=>t.phaseId!==btn.dataset.pid); save('origin_tasks', state.tasks);
-                    render();
+                showConfirm("フェーズとその中の全タスクを削除しますか？", async () => {
+                    if(db) {
+                        await deleteDataFromDb('phases', btn.dataset.pid);
+                        const tks = state.tasks.filter(t=>t.phaseId===btn.dataset.pid);
+                        for(const t of tks) await deleteDataFromDb('tasks', t.id);
+                    } else {
+                        state.phases = state.phases.filter(p=>p.id!==btn.dataset.pid); saveLocal('origin_phases', state.phases);
+                        state.tasks = state.tasks.filter(t=>t.phaseId!==btn.dataset.pid); saveLocal('origin_tasks', state.tasks);
+                        render();
+                    }
                 });
             }
             if (action === 'open-new-task') {
@@ -1302,21 +1471,31 @@
                 }
                 const pTasks = state.tasks.filter(t => t.phaseId === state.newTaskPhaseId);
                 const maxOrder = pTasks.length > 0 ? Math.max(...pTasks.map(t => t.order)) : 0;
-                state.tasks.push({
-                    id: genId(),
+                
+                const newTask = {
                     phaseId: state.newTaskPhaseId,
                     title: state.newTaskData.title,
                     type: state.newTaskData.type,
                     content: state.newTaskData.content,
                     order: maxOrder + 1
-                });
-                save('origin_tasks', state.tasks);
+                };
+
+                if(db) {
+                    await saveDataToDb('tasks', newTask);
+                } else {
+                    state.tasks.push({ id: genId(), ...newTask });
+                    saveLocal('origin_tasks', state.tasks);
+                }
                 state.newTaskPhaseId = null;
                 render();
             }
             if (action === 'delete-task') {
-                showConfirm(`タスク「${btn.dataset.title}」を削除しますか？`, () => {
-                    state.tasks = state.tasks.filter(t=>t.id!==btn.dataset.tid); save('origin_tasks', state.tasks); render();
+                showConfirm(`タスク「${btn.dataset.title}」を削除しますか？`, async () => {
+                    if(db) {
+                        await deleteDataFromDb('tasks', btn.dataset.tid);
+                    } else {
+                        state.tasks = state.tasks.filter(t=>t.id!==btn.dataset.tid); saveLocal('origin_tasks', state.tasks); render();
+                    }
                 });
             }
             if (action === 'edit-task') {
@@ -1325,8 +1504,12 @@
             }
             if (action === 'cancel-edit') { state.editingTask = null; render(); }
             if (action === 'save-edit') {
-                Object.assign(state.editingTask, state.editTaskData);
-                save('origin_tasks', state.tasks);
+                if(db) {
+                     await saveDataToDb('tasks', { title: state.editTaskData.title, type: state.editTaskData.type, content: state.editTaskData.content }, state.editingTask.id);
+                } else {
+                    Object.assign(state.editingTask, state.editTaskData);
+                    saveLocal('origin_tasks', state.tasks);
+                }
                 state.editingTask = null; render();
             }
         }
