@@ -202,24 +202,18 @@
 
     <script>
         // ==========================================
-        // 1. Firebase 初期化
+        // 1. アプリの起動処理
         // ==========================================
-        let db, auth, appId;
-        const TENANT_ID = "origin_tenant_html_v1"; // 他のテストデータと混ざらないように独自のID
-        
-        try {
-            // ※重要: 環境変数から設定を読み込む（Canvas環境が提供する設定）
-            const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-            appId = typeof __app_id !== 'undefined' ? __app_id : 'origin-compass-html';
-            
-            if (Object.keys(firebaseConfig).length > 0) {
-                firebase.initializeApp(firebaseConfig);
-                auth = firebase.auth();
-                db = firebase.firestore();
+        // GitHub Pages等のCSPセキュリティ制限でブロックされないように、
+        // 外部スクリプト(ServiceWorker)の動的生成を排除し、安全に初期化します。
+        window.addEventListener('DOMContentLoaded', () => {
+            try {
+                init();
+            } catch (e) {
+                console.error("App initialization failed:", e);
+                document.body.innerHTML = '<div style="padding: 2rem; text-align: center;"><h2 style="color: red; font-family: sans-serif;">起動エラーが発生しました</h2><p style="font-family: sans-serif; color: #555;">ブラウザのデータが破損している可能性があります。</p><button onclick="localStorage.clear(); window.location.reload();" style="padding: 10px 20px; margin-top: 20px; background: #18181b; color: white; border: none; border-radius: 8px; cursor: pointer;">データをリセットして再起動</button></div>';
             }
-        } catch (e) {
-            console.error("Firebase init error", e);
-        }
+        });
 
         // ==========================================
         // 2. アイコンデータ
@@ -305,12 +299,12 @@
             isLoading: true // 初期データ読み込み中
         };
 
-        // Firebaseのリアルタイムリスナーの解除関数を保持
-        let unsubProfiles, unsubPhases, unsubTasks, unsubUserTasks;
-
         // Firebaseが使えない環境（ローカル実行時など）のための代替処理
         const loadLocal = (key, def) => { try { const d = localStorage.getItem(key); return d ? JSON.parse(d) : def; } catch(e) { return def; } };
         const saveLocal = (key, data) => { try { localStorage.setItem(key, JSON.stringify(data)); } catch(e) {} };
+
+        // グローバルなdb変数。定義されていない場合はローカルモードとして動作する
+        let db = typeof window.db !== 'undefined' ? window.db : null;
 
         function setupRealtimeListeners() {
             if (!db) {
@@ -336,7 +330,7 @@
             const publicDataPath = `artifacts/${appId}/public/data`;
             
             // Profiles Listener
-            unsubProfiles = db.collection(`${publicDataPath}/profiles`)
+            db.collection(`${publicDataPath}/profiles`)
                 .where('tenantId', '==', TENANT_ID)
                 .onSnapshot(snap => {
                     state.profiles = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -350,11 +344,16 @@
                             handleGlobalClick({target: {closest: () => ({getAttribute: () => 'logout'})}});
                         }
                     }
+                    state.isLoading = false;
                     render();
-                }, e => console.error("Profiles listener error:", e));
+                }, e => {
+                    console.error("Profiles listener error:", e);
+                    state.isLoading = false;
+                    render();
+                });
 
             // Phases Listener
-            unsubPhases = db.collection(`${publicDataPath}/phases`)
+            db.collection(`${publicDataPath}/phases`)
                 .where('tenantId', '==', TENANT_ID)
                 .onSnapshot(snap => {
                     const data = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -363,7 +362,7 @@
                 }, e => console.error("Phases listener error:", e));
 
             // Tasks Listener
-            unsubTasks = db.collection(`${publicDataPath}/tasks`)
+            db.collection(`${publicDataPath}/tasks`)
                 .where('tenantId', '==', TENANT_ID)
                 .onSnapshot(snap => {
                     const data = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -372,7 +371,7 @@
                 }, e => console.error("Tasks listener error:", e));
 
             // UserTasks Listener
-            unsubUserTasks = db.collection(`${publicDataPath}/userTasks`)
+            db.collection(`${publicDataPath}/userTasks`)
                 .where('tenantId', '==', TENANT_ID)
                 .onSnapshot(snap => {
                     state.userTasks = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -450,7 +449,7 @@
                   { type: 'normal', title: 'リスト出し、エリア選びのやり方を勉強する' },
                   { type: 'text', title: '同行後 感じたこと 気になることをメモに書いて 上層部に送信' },
                   { type: 'normal', title: '1人で稼働してみる' },
-                  { type: 'text', title: '稼働してみて思ったこと、良かったこと、悪かったこと、わからなかったことを言語化してみる' },
+                  { type: 'text', title: '稼働してみて思ったこと、良かったこと、悪かったこと、わかったことを言語化してみる' },
                   { type: 'normal', title: 'アウト返し集 の知識を入れる' },
                   { type: 'normal', title: '初めてのアポを取る' },
                   { type: 'text', title: 'どうしたら契約が取れるか 何が必要か 何が足りないかを言語化して送信する' },
