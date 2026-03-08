@@ -185,7 +185,7 @@
         .modal-content { background: var(--bg-white); width: 100%; max-width: 24rem; border-radius: 2rem; padding: 2rem; box-shadow: var(--shadow-xl); text-align: center; animation: fadeIn 0.2s ease-out; }
     </style>
     
-    <!-- Firebase SDK (CDN) - HTMLだけでFirestoreを使うための公式スクリプト -->
+    <!-- Firebase SDK (CDN) -->
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
@@ -204,8 +204,6 @@
         // ==========================================
         // 1. アプリの起動処理
         // ==========================================
-        // GitHub Pages等のCSPセキュリティ制限でブロックされないように、
-        // 外部スクリプト(ServiceWorker)の動的生成を排除し、安全に初期化します。
         window.addEventListener('DOMContentLoaded', () => {
             try {
                 init();
@@ -214,6 +212,44 @@
                 document.body.innerHTML = '<div style="padding: 2rem; text-align: center;"><h2 style="color: red; font-family: sans-serif;">起動エラーが発生しました</h2><p style="font-family: sans-serif; color: #555;">ブラウザのデータが破損している可能性があります。</p><button onclick="localStorage.clear(); window.location.reload();" style="padding: 10px 20px; margin-top: 20px; background: #18181b; color: white; border: none; border-radius: 8px; cursor: pointer;">データをリセットして再起動</button></div>';
             }
         });
+
+        // ==========================================
+        // Firebase（データベース）初期化設定
+        // ==========================================
+        const MY_FIREBASE_CONFIG = {
+            apiKey: "AIzaSyBaxm-knMF59Mv-lt8qn_HEcfQwROEMV_s",
+            authDomain: "origin-compass.firebaseapp.com",
+            projectId: "origin-compass",
+            storageBucket: "origin-compass.firebasestorage.app",
+            messagingSenderId: "182042297090",
+            appId: "1:182042297090:web:f6e78f31c11ea6751cf81b",
+            measurementId: "G-L5TE7DMJW7"
+        };
+
+        // グローバルなdb変数。
+        let db = null;
+        let auth = null;
+        let appId = 'origin-compass-html';
+        const TENANT_ID = "origin_tenant_html_v1";
+        
+        try {
+            let firebaseConfig = Object.keys(MY_FIREBASE_CONFIG).length > 0 ? MY_FIREBASE_CONFIG : {};
+            
+            if (Object.keys(firebaseConfig).length === 0 && typeof __firebase_config !== 'undefined') {
+                firebaseConfig = JSON.parse(__firebase_config);
+            }
+            if (typeof __app_id !== 'undefined') {
+                appId = __app_id;
+            }
+            
+            if (Object.keys(firebaseConfig).length > 0) {
+                firebase.initializeApp(firebaseConfig);
+                auth = firebase.auth();
+                db = firebase.firestore();
+            }
+        } catch (e) {
+            console.error("Firebase init error", e);
+        }
 
         // ==========================================
         // 2. アイコンデータ
@@ -265,8 +301,6 @@
             view: 'dashboard',
             activeTask: null,
             activeTargetUser: null, 
-            
-            // UI State
             authMode: 'login',
             authRole: 'user',
             authName: '',
@@ -276,52 +310,59 @@
             authShowPass: false,
             authError: '',
             mobileMenuOpen: false,
-            
-            // Dashboard Filters
             filter: 'all',
-
-            // Editing state
             editingTask: null, 
             editTaskData: {},
             newPhaseName: '',
             newSecretKey: '',
-            
-            // New Task State
             newTaskPhaseId: null,
             newTaskData: { title: '', type: 'normal', content: '' },
-
             testAnswers: {},
             testResult: null,
-            
-            // Modals
             confirm: null,
             alert: null,
             isLoading: true // 初期データ読み込み中
         };
 
-        // Firebaseが使えない環境（ローカル実行時など）のための代替処理
-        const loadLocal = (key, def) => { try { const d = localStorage.getItem(key); return d ? JSON.parse(d) : def; } catch(e) { return def; } };
-        const saveLocal = (key, data) => { try { localStorage.setItem(key, JSON.stringify(data)); } catch(e) {} };
-
-        // グローバルなdb変数。定義されていない場合はローカルモードとして動作する
-        let db = typeof window.db !== 'undefined' ? window.db : null;
+        // ★ データベースへのアクセス拒否時に画面を切り替える強力な防護ロジック
+        function handleFirebaseError(e, context) {
+            console.error(`${context} error:`, e);
+            if (e.code === 'permission-denied' || (e.message && e.message.includes('Missing or insufficient permissions'))) {
+                // アプリの全画面を「鍵が開いていない案内画面」に書き換えて強制停止する
+                document.getElementById('app').innerHTML = `
+                    <div style="min-height: 100vh; background-color: #fef2f2; display: flex; align-items: center; justify-content: center; padding: 20px; font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
+                        <div style="background: white; padding: 40px; border-radius: 24px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); max-width: 600px; width: 100%; border: 1px solid #fecaca;">
+                            <div style="text-align: center; margin-bottom: 20px;">
+                                <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin: 0 auto; background: #fef2f2; padding: 10px; border-radius: 50%;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+                            </div>
+                            <h2 style="color: #dc2626; font-size: 24px; font-weight: 900; margin-bottom: 20px; text-align: center; letter-spacing: -0.05em;">データベースの鍵が閉まっています</h2>
+                            <p style="color: #3f3f46; font-size: 15px; font-weight: 500; line-height: 1.7; margin-bottom: 24px;">
+                                現在、データの共有機能（Firebase）には繋がっていますが、<strong>セキュリティ設定が「アクセス拒否」になっているため、他の人とデータを共有できません。</strong><br>
+                                （※アプリのコードからはこのセキュリティを解除できない仕様になっています）<br><br>
+                                全員で共有される状態にするために、以下の手順で鍵を開けてください。
+                            </p>
+                            <div style="background: #f8fafc; padding: 24px; border-radius: 16px; border: 1px solid #e2e8f0; margin-bottom: 30px;">
+                                <h3 style="font-weight: 900; margin-bottom: 16px; color: #0f172a; font-size: 16px;">🛠️ 鍵を開ける手順（1分で終わります）</h3>
+                                <ol style="color: #475569; line-height: 2; padding-left: 24px; margin: 0; font-size: 14px; font-weight: 500;">
+                                    <li><a href="https://console.firebase.google.com/" target="_blank" style="color: #2563eb; text-decoration: underline; font-weight: 900;">Firebaseコンソール</a> を開き「origin-compass」を選択</li>
+                                    <li>左側のメニューから <strong>「Firestore Database」</strong> をクリック</li>
+                                    <li>画面上部にある <strong>「ルール」</strong> というタブをクリック</li>
+                                    <li><code>allow read, write: if <span style="color:#dc2626; font-weight:900;">false</span>;</code><br>を<br><code>allow read, write: if <span style="color:#16a34a; font-weight:900;">true</span>;</code><br>に書き換える</li>
+                                    <li><strong>「公開」</strong> ボタンを押す</li>
+                                </ol>
+                            </div>
+                            <button onclick="window.location.reload()" style="width: 100%; padding: 18px; background: #18181b; color: white; border: none; border-radius: 14px; font-size: 16px; font-weight: 900; cursor: pointer; transition: transform 0.2s;" onmousedown="this.style.transform='scale(0.98)'" onmouseup="this.style.transform='scale(1)'">設定を変更したので再読み込みする</button>
+                        </div>
+                    </div>
+                `;
+            } else {
+                state.isLoading = false;
+                render();
+            }
+        }
 
         function setupRealtimeListeners() {
             if (!db) {
-                // Firebaseがない場合はローカルストレージを使用（予備）
-                state.profiles = loadLocal('origin_profiles', []);
-                state.phases = loadLocal('origin_phases', []);
-                state.tasks = loadLocal('origin_tasks', []);
-                state.userTasks = loadLocal('origin_userTasks', []);
-                state.settings = loadLocal('origin_settings', { adminSecretKey: 'origin2026' });
-                const sid = loadLocal('origin_current_id', null);
-                if (sid) {
-                    state.currentUser = state.profiles.find(p => p.id === sid);
-                    if(state.currentUser) {
-                        state.currentUser.lastActiveAt = Date.now();
-                        saveLocal('origin_profiles', state.profiles);
-                    }
-                }
                 state.isLoading = false;
                 render();
                 return;
@@ -329,54 +370,33 @@
 
             const publicDataPath = `artifacts/${appId}/public/data`;
             
-            // Profiles Listener
-            db.collection(`${publicDataPath}/profiles`)
-                .where('tenantId', '==', TENANT_ID)
-                .onSnapshot(snap => {
-                    state.profiles = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    // 現在のユーザー情報を更新
-                    if (state.currentUser) {
-                        const updatedUser = state.profiles.find(p => p.id === state.currentUser.id);
-                        if (updatedUser) {
-                            state.currentUser = updatedUser;
-                        } else {
-                            // 削除されていた場合ログアウト
-                            handleGlobalClick({target: {closest: () => ({getAttribute: () => 'logout'})}});
-                        }
-                    }
-                    state.isLoading = false;
-                    render();
-                }, e => {
-                    console.error("Profiles listener error:", e);
-                    state.isLoading = false;
-                    render();
-                });
+            db.collection(`${publicDataPath}/profiles`).where('tenantId', '==', TENANT_ID).onSnapshot(snap => {
+                state.profiles = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                if (state.currentUser) {
+                    const updatedUser = state.profiles.find(p => p.id === state.currentUser.id);
+                    if (updatedUser) state.currentUser = updatedUser;
+                    else handleGlobalClick({target: {closest: () => ({getAttribute: () => 'logout'})}});
+                }
+                state.isLoading = false;
+                render();
+            }, e => handleFirebaseError(e, "Profiles listener"));
 
-            // Phases Listener
-            db.collection(`${publicDataPath}/phases`)
-                .where('tenantId', '==', TENANT_ID)
-                .onSnapshot(snap => {
-                    const data = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    state.phases = data.sort((a, b) => a.order - b.order);
-                    render();
-                }, e => console.error("Phases listener error:", e));
+            db.collection(`${publicDataPath}/phases`).where('tenantId', '==', TENANT_ID).onSnapshot(snap => {
+                const data = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                state.phases = data.sort((a, b) => a.order - b.order);
+                render();
+            }, e => handleFirebaseError(e, "Phases listener"));
 
-            // Tasks Listener
-            db.collection(`${publicDataPath}/tasks`)
-                .where('tenantId', '==', TENANT_ID)
-                .onSnapshot(snap => {
-                    const data = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    state.tasks = data.sort((a, b) => a.order - b.order);
-                    render();
-                }, e => console.error("Tasks listener error:", e));
+            db.collection(`${publicDataPath}/tasks`).where('tenantId', '==', TENANT_ID).onSnapshot(snap => {
+                const data = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                state.tasks = data.sort((a, b) => a.order - b.order);
+                render();
+            }, e => handleFirebaseError(e, "Tasks listener"));
 
-            // UserTasks Listener
-            db.collection(`${publicDataPath}/userTasks`)
-                .where('tenantId', '==', TENANT_ID)
-                .onSnapshot(snap => {
-                    state.userTasks = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    render();
-                }, e => console.error("UserTasks listener error:", e));
+            db.collection(`${publicDataPath}/userTasks`).where('tenantId', '==', TENANT_ID).onSnapshot(snap => {
+                state.userTasks = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                render();
+            }, e => handleFirebaseError(e, "UserTasks listener"));
         }
 
         // ==========================================
@@ -388,15 +408,7 @@
 
         // Firebaseへの保存ラッパー
         async function saveDataToDb(collectionName, data, docId = null) {
-            if (!db) {
-                // ローカルフォールバック
-                if(collectionName==='profiles') { state.profiles = data; saveLocal('origin_profiles', data); }
-                if(collectionName==='phases') { state.phases = data; saveLocal('origin_phases', data); }
-                if(collectionName==='tasks') { state.tasks = data; saveLocal('origin_tasks', data); }
-                if(collectionName==='userTasks') { state.userTasks = data; saveLocal('origin_userTasks', data); }
-                return;
-            }
-
+            if (!db) return;
             try {
                 const path = `artifacts/${appId}/public/data/${collectionName}`;
                 if (docId) {
@@ -405,17 +417,16 @@
                     await db.collection(path).add({ ...data, tenantId: TENANT_ID });
                 }
             } catch (e) {
-                console.error(`Save error for ${collectionName}:`, e);
-                showAlert("データの保存に失敗しました。");
+                handleFirebaseError(e, `Save error for ${collectionName}`);
             }
         }
 
         async function deleteDataFromDb(collectionName, docId) {
-            if (!db) return; // ローカル時の処理は省略（状態更新で対応）
+            if (!db) return; 
             try {
                 await db.collection(`artifacts/${appId}/public/data/${collectionName}`).doc(docId).delete();
             } catch (e) {
-                console.error(`Delete error for ${collectionName}:`, e);
+                handleFirebaseError(e, `Delete error for ${collectionName}`);
             }
         }
 
@@ -495,34 +506,14 @@
                   }
                }
                showAlert("初期データを生成しました。");
-            } else {
-               let newPh = append ? [...state.phases] : [];
-               let newTk = append ? [...state.tasks] : [];
-               pData.forEach((p, i) => {
-                   const pid = genId();
-                   newPh.push({ id: pid, name: p.name, order: maxOrder + i + 1 });
-                   p.tasks.forEach((t, j) => { newTk.push({ id: genId(), phaseId: pid, order: j+1, ...t }); });
-               });
-               saveDataToDb('phases', newPh);
-               saveDataToDb('tasks', newTk);
-               render();
             }
         }
 
         async function handleStartWork() {
             if(!state.currentUser) return;
             if(state.currentUser.lastWorkDate === getTodayStr()) return;
-            
             const newWorkDays = (state.currentUser.workDays || 0) + 1;
-            
-            if(db) {
-                await saveDataToDb('profiles', { lastWorkDate: getTodayStr(), workDays: newWorkDays }, state.currentUser.id);
-            } else {
-                state.currentUser.lastWorkDate = getTodayStr();
-                state.currentUser.workDays = newWorkDays;
-                saveDataToDb('profiles', state.profiles);
-                render();
-            }
+            if(db) await saveDataToDb('profiles', { lastWorkDate: getTodayStr(), workDays: newWorkDays }, state.currentUser.id);
         }
 
         async function completeTask(taskId, extra = {}) {
@@ -540,15 +531,8 @@
             };
             
             if(db) {
-                if(existing) {
-                    await saveDataToDb('userTasks', data, existing.id);
-                } else {
-                    await saveDataToDb('userTasks', data);
-                }
-            } else {
-                if(existing) { Object.assign(existing, data); } 
-                else { state.userTasks.push({ id: genId(), ...data }); }
-                saveDataToDb('userTasks', state.userTasks);
+                if(existing) await saveDataToDb('userTasks', data, existing.id);
+                else await saveDataToDb('userTasks', data);
             }
             
             state.view = 'dashboard';
@@ -818,7 +802,7 @@
                             const ut = state.userTasks.find(x=>x.taskId===t.id && x.userId===u.id);
                             const isC = ut?.isCompleted; const isP = ut && !isC;
                             return `
-                            <div class="p-6 md-px-8 flex items-center justify-between cursor-pointer transition ${isC?'opacity-50 hover:bg-zinc-50':isP?'bg-amber-50/50 hover:bg-amber-50':'hover:bg-zinc-50'}" data-action="select-task" data-tid="${t.id}">
+                            <div class="p-6 md:px-8 flex items-center justify-between cursor-pointer transition ${isC?'opacity-50 hover:bg-zinc-50':isP?'bg-amber-50/50 hover:bg-amber-50':'hover:bg-zinc-50'}" data-action="select-task" data-tid="${t.id}">
                                <div class="flex items-center gap-5 pr-4">
                                   ${isC?icon('checkCircle',28,'text-zinc-900 shrink-0'):`<div class="w-7 h-7 rounded-full border-2 border-zinc-300 shrink-0"></div>`}
                                   <div>
@@ -1222,11 +1206,53 @@
             }
         }
 
-        function init() {
+        async function init() {
             document.addEventListener('input', handleGlobalInput);
             document.addEventListener('change', handleGlobalChange);
             document.addEventListener('click', handleGlobalClick);
-            setupRealtimeListeners();
+            
+            if (auth) {
+                try {
+                    // 匿名認証を使用
+                    await auth.signInAnonymously();
+                    
+                    auth.onAuthStateChanged((user) => {
+                        if (user) {
+                            setupRealtimeListeners();
+                        } else {
+                            state.isLoading = false;
+                            render();
+                        }
+                    });
+                } catch(e) {
+                    console.error("Auth error:", e);
+                    // 匿名認証が無効になっている場合のエラー案内画面
+                    document.getElementById('app').innerHTML = `
+                    <div style="min-height: 100vh; background-color: #fef2f2; display: flex; align-items: center; justify-content: center; padding: 20px; font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
+                        <div style="background: white; padding: 40px; border-radius: 24px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); max-width: 600px; width: 100%; border: 1px solid #fecaca;">
+                            <div style="text-align: center; margin-bottom: 20px;">
+                                <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin: 0 auto; background: #fef2f2; padding: 10px; border-radius: 50%;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+                            </div>
+                            <h2 style="color: #dc2626; font-size: 24px; font-weight: 900; margin-bottom: 20px; text-align: center; letter-spacing: -0.05em;">認証機能が有効になっていません</h2>
+                            <p style="color: #3f3f46; font-size: 15px; font-weight: 500; line-height: 1.7; margin-bottom: 24px;">
+                                Firebaseの「Authentication（認証）」設定で「匿名ログイン」が有効になっていないため、データの共有を開始できません。
+                            </p>
+                            <div style="background: #f8fafc; padding: 24px; border-radius: 16px; border: 1px solid #e2e8f0; margin-bottom: 30px;">
+                                <h3 style="font-weight: 900; margin-bottom: 16px; color: #0f172a; font-size: 16px;">🛠️ 有効にする手順</h3>
+                                <ol style="color: #475569; line-height: 2; padding-left: 24px; margin: 0; font-size: 14px; font-weight: 500;">
+                                    <li>Firebaseコンソールの左メニューから「Authentication（人のマーク）」を開く</li>
+                                    <li>「始める」を押す</li>
+                                    <li>「Sign-in method」タブを開く</li>
+                                    <li>プロバイダ一覧から<strong>「匿名」</strong>を選び、有効にして保存する</li>
+                                </ol>
+                            </div>
+                            <button onclick="window.location.reload()" style="width: 100%; padding: 18px; background: #18181b; color: white; border: none; border-radius: 14px; font-size: 16px; font-weight: 900; cursor: pointer; transition: transform 0.2s;" onmousedown="this.style.transform='scale(0.98)'" onmouseup="this.style.transform='scale(1)'">設定を変更したので再読み込みする</button>
+                        </div>
+                    </div>`;
+                }
+            } else {
+                setupRealtimeListeners(); // ローカルモード
+            }
         }
 
         // ==========================================
