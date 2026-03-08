@@ -257,16 +257,6 @@
             setTasks(newTasks); saveData('compass_tasks', newTasks);
           };
 
-          const handleResetAndSeed = () => {
-            if (window.confirm("現在のタスクを全て削除し、本来の全39タスクに初期化しますか？\n※ユーザーの進捗は保持されます。")) {
-              setPhases([]); saveData('compass_phases', []);
-              setTasks([]); saveData('compass_tasks', []);
-              setTimeout(() => {
-                handleSeedData();
-              }, 100);
-            }
-          };
-
           const addPhase = (name) => {
             const updated = [...phases, { id: genId(), name, order: phases.length + 1 }];
             setPhases(updated); saveData('compass_phases', updated);
@@ -360,7 +350,7 @@
                 {view === 'dashboard' && userProfile.role === 'admin' && <AdminDashboard users={newbies} tasks={tasks} userTasks={userTasks} phases={phases} onSelectUser={u => {setActiveTargetUser(u); setView('userDetail');}} />}
                 {view === 'dashboard' && userProfile.role === 'user' && <UserDashboard user={userProfile} phases={phases} tasks={tasks} userTasks={userTasks} onSelectTask={t => {setActiveTask(t); setView('taskExec');}} updateProfile={updateProfile} />}
                 
-                {view === 'manage' && userProfile.role === 'admin' && <PhaseManagement phases={phases} tasks={tasks} onSeed={handleSeedData} onResetSeed={handleResetAndSeed} adminSecretKey={settings.adminSecretKey} updateSettings={updateSettings} addPhase={addPhase} deletePhase={deletePhase} addTask={addTask} updateTask={updateTask} deleteTask={deleteTask} />}
+                {view === 'manage' && userProfile.role === 'admin' && <PhaseManagement phases={phases} tasks={tasks} onSeed={handleSeedData} adminSecretKey={settings.adminSecretKey} updateSettings={updateSettings} addPhase={addPhase} deletePhase={deletePhase} addTask={addTask} updateTask={updateTask} deleteTask={deleteTask} />}
                 
                 {view === 'userDetail' && <UserDetailView user={activeTargetUser} phases={phases} tasks={tasks} userTasks={userTasks} onBack={() => setView('dashboard')} updateUserTask={updateUserTask} />}
                 {view === 'taskExec' && <TaskExecutor task={activeTask} user={userProfile} userTasks={userTasks} onBack={() => setView('dashboard')} addUserTask={addUserTask} updateUserTask={updateUserTask} />}
@@ -643,25 +633,54 @@
           const [editT, setEditT] = useState(null);
           
           const [newSecret, setNewSecret] = useState(adminSecretKey);
-          const [isUpdatingSecret, setIsUpdatingSecret] = useState(false);
+          
+          // ★ カスタムモーダルの状態管理を追加
+          const [confirmDialog, setConfirmDialog] = useState(null); // { message: string, onConfirm: function }
+          const [alertDialog, setAlertDialog] = useState(null);     // string
 
           useEffect(() => { setNewSecret(adminSecretKey); }, [adminSecretKey]);
 
           const handleUpdateSecret = () => {
-            setIsUpdatingSecret(true);
             updateSettings({ adminSecretKey: newSecret });
-            alert('✅ 管理者シークレットキーを更新しました！\n次回からの管理者登録にはこの新しいキーが必要になります。');
-            setIsUpdatingSecret(false);
+            setAlertDialog('✅ 管理者シークレットキーを更新しました！\n次回からの管理者登録にはこの新しいキーが必要になります。');
           };
 
           return (
-            <div className="space-y-10 animate-in pb-20">
+            <div className="space-y-10 animate-in pb-20 relative">
+              {/* カスタム Alert モーダル */}
+              {alertDialog && (
+                <div className="fixed inset-0 bg-zinc-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-6 animate-in">
+                   <div className="bg-white w-full max-w-sm rounded-[2rem] p-8 shadow-2xl text-center">
+                      <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4"><CheckCircle size={32}/></div>
+                      <p className="text-zinc-900 font-bold whitespace-pre-wrap mb-6 leading-relaxed">{alertDialog}</p>
+                      <button onClick={() => setAlertDialog(null)} className="w-full py-4 bg-zinc-900 text-white font-bold rounded-2xl active:scale-95 transition-transform">OK</button>
+                   </div>
+                </div>
+              )}
+
+              {/* カスタム Confirm モーダル */}
+              {confirmDialog && (
+                <div className="fixed inset-0 bg-zinc-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-6 animate-in">
+                   <div className="bg-white w-full max-w-sm rounded-[2rem] p-8 shadow-2xl text-center">
+                      <div className="w-16 h-16 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-4"><AlertCircle size={32}/></div>
+                      <p className="text-zinc-900 font-bold whitespace-pre-wrap mb-6 leading-relaxed">{confirmDialog.message}</p>
+                      <div className="flex gap-3">
+                         <button onClick={confirmDialog.onConfirm} className="flex-1 py-4 bg-red-600 text-white font-bold rounded-2xl shadow-lg active:scale-95 transition-transform">はい</button>
+                         <button onClick={() => setConfirmDialog(null)} className="flex-1 py-4 bg-zinc-100 text-zinc-700 font-bold rounded-2xl hover:bg-zinc-200 transition-colors">キャンセル</button>
+                      </div>
+                   </div>
+                </div>
+              )}
+
               <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-zinc-200 pb-8">
                  <div><h2 className="text-4xl font-black">管理設定</h2></div>
                  {phases.length === 0 ? (
                    <button onClick={onSeed} className="bg-zinc-900 text-white px-6 py-4 rounded-2xl text-sm font-black shadow-xl active:scale-95 transition-transform">初期データ(39タスク)を生成</button>
                  ) : (
-                   <button onClick={onResetSeed} className="bg-red-50 text-red-600 border border-red-200 px-6 py-3 rounded-2xl text-xs font-black shadow-sm active:scale-95 transition-transform">全タスクを初期化して再生成</button>
+                   <button onClick={() => setConfirmDialog({
+                       message: "現在のタスクを全て削除し、本来の全39タスクに初期化しますか？\n※ユーザーの進捗は保持されます。",
+                       onConfirm: () => { onResetSeed(); setConfirmDialog(null); }
+                   })} className="bg-red-50 text-red-600 border border-red-200 px-6 py-3 rounded-2xl text-xs font-black shadow-sm active:scale-95 transition-transform">全タスクを初期化して再生成</button>
                  )}
               </div>
 
@@ -670,7 +689,7 @@
                 <p className="text-zinc-500 text-base font-bold mb-6">新しい管理者を登録する際に必要な「シークレットキー」を変更できます。</p>
                 <div className="flex flex-col md:flex-row gap-4 items-center">
                   <input type="text" placeholder="新しいシークレットキー" value={newSecret} onChange={e=>setNewSecret(e.target.value)} className="flex-1 w-full p-5 bg-zinc-50 border border-zinc-200 rounded-2xl outline-none font-bold text-lg"/>
-                  <button onClick={handleUpdateSecret} disabled={isUpdatingSecret || newSecret === adminSecretKey} className="w-full md:w-auto bg-zinc-900 text-white px-10 py-5 rounded-2xl font-black text-sm disabled:opacity-50">更新する</button>
+                  <button onClick={handleUpdateSecret} disabled={newSecret === adminSecretKey} className="w-full md:w-auto bg-zinc-900 text-white px-10 py-5 rounded-2xl font-black text-sm disabled:opacity-50">更新する</button>
                 </div>
               </div>
 
@@ -678,7 +697,13 @@
                  <h3 className="text-2xl font-black flex items-center gap-3 ml-2"><div className="w-2 h-8 bg-zinc-900 rounded-full"></div>ロードマップ編集</h3>
                  {phases.map(p => (
                    <div key={p.id} className="bg-white rounded-[2rem] border border-zinc-200 overflow-hidden shadow-sm">
-                      <div className="bg-zinc-50 px-8 py-5 border-b border-zinc-100 flex justify-between items-center text-lg"><span className="font-black text-zinc-800">{p.name}</span><button onClick={() => { if(window.confirm('フェーズを削除しますか？')) deletePhase(p.id); }} className="text-zinc-400 hover:text-red-500"><X size={20}/></button></div>
+                      <div className="bg-zinc-50 px-8 py-5 border-b border-zinc-100 flex justify-between items-center text-lg">
+                        <span className="font-black text-zinc-800">{p.name}</span>
+                        <button onClick={() => setConfirmDialog({
+                            message: `フェーズ「${p.name}」と、その中のすべてのタスクを削除しますか？`,
+                            onConfirm: () => { deletePhase(p.id); setConfirmDialog(null); }
+                        })} className="text-zinc-400 hover:text-red-500"><X size={20}/></button>
+                      </div>
                       <div className="p-6 space-y-4">
                         {tasks.filter(t=>t.phaseId===p.id).map((t, idx) => (
                           <div key={t.id} className="flex items-center justify-between p-5 bg-white border border-zinc-100 rounded-2xl group hover:border-zinc-300">
@@ -688,7 +713,10 @@
                             </div>
                             <div className="flex gap-2">
                               <button onClick={()=>setEditT(t)} className="p-2.5 text-zinc-400 bg-white hover:text-zinc-900 rounded-xl shadow-sm border border-zinc-100"><Edit3 size={18}/></button>
-                              <button onClick={()=>{ if(window.confirm('タスクを削除しますか？')) deleteTask(t.id); }} className="p-2.5 text-zinc-400 bg-white hover:text-red-600 rounded-xl shadow-sm border border-zinc-100"><X size={18}/></button>
+                              <button onClick={() => setConfirmDialog({
+                                  message: `タスク「${t.title}」を削除しますか？`,
+                                  onConfirm: () => { deleteTask(t.id); setConfirmDialog(null); }
+                              })} className="p-2.5 text-zinc-400 bg-white hover:text-red-600 rounded-xl shadow-sm border border-zinc-100"><X size={18}/></button>
                             </div>
                           </div>
                         ))}
@@ -788,7 +816,10 @@
         };
 
         const TestRunner = ({ content, ut, onComplete }) => {
-          const [data] = useState(() => JSON.parse(content || '{"questions":[],"passScore":100}'));
+          const [data] = useState(() => {
+             try { return JSON.parse(content || '{"questions":[],"passScore":100}'); }
+             catch(e) { return { questions: [], passScore: 100 }; }
+          });
           const [sel, setSel] = useState({});
           const [res, setRes] = useState(null);
 
@@ -827,4 +858,3 @@
     </script>
 </body>
 </html>
-
