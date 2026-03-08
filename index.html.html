@@ -3,31 +3,161 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ORIGIN Compass (Local Test)</title>
+    <title>ORIGIN Compass</title>
     
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- React & ReactDOM -->
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-    
-    <!-- Babel -->
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-
     <style>
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: #f4f4f5; }
-        ::-webkit-scrollbar-thumb { background: #d4d4d8; border-radius: 4px; }
-        .animate-in { animation: fadeIn 0.4s ease-out; }
+        /* ==========================================
+           1. カスタムCSS (Tailwindの代替)
+           ========================================== */
+        :root {
+            --bg-body: #fafafa;
+            --bg-white: #ffffff;
+            --zinc-50: #fafafa;
+            --zinc-100: #f4f4f5;
+            --zinc-200: #e4e4e7;
+            --zinc-300: #d4d4d8;
+            --zinc-400: #a1a1aa;
+            --zinc-500: #71717a;
+            --zinc-600: #52525b;
+            --zinc-800: #27272a;
+            --zinc-900: #18181b;
+            --red-50: #fef2f2;
+            --red-200: #fecaca;
+            --red-600: #dc2626;
+            --amber-50: #fffbeb;
+            --amber-200: #fde68a;
+            --amber-700: #b45309;
+            --emerald-50: #ecfdf5;
+            --emerald-200: #a7f3d0;
+            --emerald-600: #059669;
+            --shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.1);
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
+            --radius-2xl: 1.5rem;
+            --radius-full: 9999px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: var(--bg-body); color: var(--zinc-900); line-height: 1.5; -webkit-font-smoothing: antialiased; }
+        
+        button { cursor: pointer; border: none; background: none; font: inherit; color: inherit; transition: all 0.2s; }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+        button:active:not(:disabled) { transform: scale(0.98); }
+        
+        input, select, textarea { width: 100%; padding: 1rem; border: 1px solid var(--zinc-200); border-radius: var(--radius-xl); background: var(--bg-white); font: inherit; outline: none; transition: all 0.2s; }
+        input:focus, select:focus, textarea:focus { border-color: var(--zinc-900); box-shadow: 0 0 0 2px rgba(24,24,27,0.1); }
+        
+        a { text-decoration: none; color: inherit; }
+        .hidden { display: none !important; }
+
+        /* Typography */
+        .text-xs { font-size: 0.75rem; } .text-sm { font-size: 0.875rem; } .text-base { font-size: 1rem; }
+        .text-lg { font-size: 1.125rem; } .text-xl { font-size: 1.25rem; } .text-2xl { font-size: 1.5rem; }
+        .text-3xl { font-size: 1.875rem; } .text-4xl { font-size: 2.25rem; } .text-5xl { font-size: 3rem; }
+        .font-medium { font-weight: 500; } .font-bold { font-weight: 700; } .font-black { font-weight: 900; }
+        .text-center { text-align: center; } .text-right { text-align: right; }
+        .text-zinc-400 { color: var(--zinc-400); } .text-zinc-500 { color: var(--zinc-500); }
+        .text-zinc-600 { color: var(--zinc-600); } .text-zinc-900 { color: var(--zinc-900); }
+        .text-white { color: var(--bg-white); } .text-red-600 { color: var(--red-600); }
+        .uppercase { text-transform: uppercase; } .tracking-wider { letter-spacing: 0.05em; } .tracking-widest { letter-spacing: 0.1em; }
+        .line-through { text-decoration: line-through; } .whitespace-pre-wrap { white-space: pre-wrap; }
+
+        /* Layout */
+        .flex { display: flex; } .flex-col { flex-direction: column; } .flex-1 { flex: 1; }
+        .items-center { align-items: center; } .items-end { align-items: flex-end; }
+        .justify-center { justify-content: center; } .justify-between { justify-content: space-between; }
+        .flex-wrap { flex-wrap: wrap; } .shrink-0 { flex-shrink: 0; }
+        .gap-2 { gap: 0.5rem; } .gap-3 { gap: 0.75rem; } .gap-4 { gap: 1rem; } .gap-6 { gap: 1.5rem; } .gap-8 { gap: 2rem; }
+
+        .w-full { width: 100%; } .h-full { height: 100%; }
+        .w-8 { width: 2rem; } .h-8 { height: 2rem; }
+        .w-12 { width: 3rem; } .h-12 { height: 3rem; }
+        .w-16 { width: 4rem; } .h-16 { height: 4rem; }
+        .max-w-md { max-width: 28rem; } .max-w-2xl { max-width: 42rem; } .max-w-4xl { max-width: 56rem; }
+        .mx-auto { margin-left: auto; margin-right: auto; }
+        .mt-2 { margin-top: 0.5rem; } .mt-4 { margin-top: 1rem; } .mt-6 { margin-top: 1.5rem; } .mt-8 { margin-top: 2rem; }
+        .mb-2 { margin-bottom: 0.5rem; } .mb-4 { margin-bottom: 1rem; } .mb-6 { margin-bottom: 1.5rem; } .mb-8 { margin-bottom: 2rem; }
+        .p-4 { padding: 1rem; } .p-6 { padding: 1.5rem; } .p-8 { padding: 2rem; }
+        .px-4 { padding-left: 1rem; padding-right: 1rem; } .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+        .px-6 { padding-left: 1.5rem; padding-right: 1.5rem; } .py-4 { padding-top: 1rem; padding-bottom: 1rem; }
+        .pt-6 { padding-top: 1.5rem; } .pb-12 { padding-bottom: 3rem; }
+        
+        .relative { position: relative; } .absolute { position: absolute; }
+        .inset-0 { top: 0; right: 0; bottom: 0; left: 0; } .inset-y-0 { top: 0; bottom: 0; } .right-0 { right: 0; }
+
+        /* Backgrounds & Borders */
+        .bg-white { background-color: var(--bg-white); } .bg-zinc-50 { background-color: var(--zinc-50); }
+        .bg-zinc-100 { background-color: var(--zinc-100); } .bg-zinc-900 { background-color: var(--zinc-900); }
+        .border { border: 1px solid var(--zinc-200); } .border-2 { border: 2px solid var(--zinc-200); }
+        .border-t { border-top: 1px solid var(--zinc-200); } .border-b { border-bottom: 1px solid var(--zinc-200); }
+        .rounded-lg { border-radius: var(--radius-lg); } .rounded-xl { border-radius: var(--radius-xl); }
+        .rounded-2xl { border-radius: var(--radius-2xl); } .rounded-3xl { border-radius: 2rem; }
+        .rounded-full { border-radius: var(--radius-full); }
+        .shadow-sm { box-shadow: var(--shadow-sm); } .shadow-md { box-shadow: var(--shadow-md); }
+        .shadow-lg { box-shadow: var(--shadow-lg); } .shadow-xl { box-shadow: var(--shadow-xl); }
+        .overflow-hidden { overflow: hidden; } .object-cover { object-fit: cover; }
+
+        /* UI Components */
+        .btn-primary { background-color: var(--zinc-900); color: var(--bg-white); font-weight: bold; padding: 1rem 1.5rem; border-radius: var(--radius-xl); display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; width: 100%; box-shadow: var(--shadow-md); }
+        .btn-primary:hover { background-color: var(--zinc-800); }
+        
+        .badge { padding: 0.25rem 0.5rem; border-radius: var(--radius-full); font-size: 0.7rem; font-weight: 900; border: 1px solid; display: inline-flex; align-items: center; gap: 0.25rem; white-space: nowrap; text-transform: uppercase;}
+        .badge-red { background: var(--red-50); color: var(--red-600); border-color: var(--red-200); }
+        .badge-amber { background: var(--amber-50); color: var(--amber-700); border-color: var(--amber-200); }
+        .badge-emerald { background: var(--emerald-50); color: var(--emerald-600); border-color: var(--emerald-200); }
+        .badge-gray { background: var(--zinc-100); color: var(--zinc-600); border-color: var(--zinc-200); }
+
+        /* Grid & Responsive */
+        .grid { display: grid; }
+        .grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        
+        .app-layout { display: flex; flex-direction: column; min-height: 100vh; }
+        .sidebar { display: none; }
+        .mobile-header { display: flex; align-items: center; justify-content: space-between; padding: 1rem; background: var(--bg-white); border-bottom: 1px solid var(--zinc-200); position: sticky; top: 0; z-index: 30; }
+        .main-content { flex: 1; padding: 1rem; overflow-y: auto; width: 100%; max-width: 72rem; margin: 0 auto; }
+        .mobile-menu { position: fixed; inset: 0; background: var(--bg-white); z-index: 40; padding: 1.5rem; display: flex; flex-direction: column; }
+        
+        @media (min-width: 768px) {
+            .app-layout { flex-direction: row; }
+            .sidebar { display: flex; width: 16rem; flex-direction: column; background: var(--bg-white); border-right: 1px solid var(--zinc-200); position: sticky; top: 0; height: 100vh; padding: 1.5rem; }
+            .mobile-header { display: none; }
+            .main-content { padding: 2.5rem; }
+            .md-grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .md-grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+            .md-flex-row { flex-direction: row; }
+            .md-items-center { align-items: center; }
+            .md-items-end { align-items: flex-end; }
+            .md-w-auto { width: auto; }
+        }
+
+        /* Nav Items */
+        .nav-item { display: flex; align-items: center; gap: 0.75rem; padding: 1rem 1.5rem; color: var(--zinc-500); font-weight: bold; font-size: 0.875rem; transition: background 0.2s; border-radius: var(--radius-xl); margin: 0.25rem 0; width: 100%; justify-content: flex-start; }
+        .nav-item:hover { background: var(--zinc-50); color: var(--zinc-900); }
+        .nav-item.active { background: var(--zinc-900); color: var(--bg-white); box-shadow: var(--shadow-md); }
+
+        /* Animations */
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-in { animation: fadeIn 0.3s ease-out forwards; }
+        
+        /* Modals */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(24, 24, 27, 0.6); backdrop-filter: blur(4px); z-index: 50; display: flex; align-items: center; justify-content: center; padding: 1.5rem; }
+        .modal-content { background: var(--bg-white); width: 100%; max-width: 24rem; border-radius: 2rem; padding: 2rem; box-shadow: var(--shadow-xl); text-align: center; animation: fadeIn 0.2s ease-out; }
     </style>
 </head>
-<body class="bg-zinc-50/50 text-zinc-900 font-sans">
-    <div id="root"></div>
+<body>
+    <!-- アプリの描画領域 -->
+    <div id="app" class="app-layout"></div>
+
+    <!-- モーダル描画領域 -->
+    <div id="modal-root"></div>
 
     <script>
-        // PWA（スマホアプリ化）用の動的マニフェスト生成
+        // ==========================================
+        // 1. PWA（スマホアプリ化）設定
+        // ==========================================
         window.addEventListener('DOMContentLoaded', () => {
             const manifestData = {
                 "name": "ORIGIN Compass",
@@ -51,7 +181,6 @@
             document.head.appendChild(link);
         });
 
-        // Service Workerの設定
         if ('serviceWorker' in navigator) {
             const swCode = `
                 self.addEventListener('install', e => self.skipWaiting());
@@ -68,793 +197,996 @@
                 navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(err => console.log('SW failed', err));
             });
         }
-    </script>
 
-    <script type="text/babel">
-        const { useState, useEffect, useRef } = React;
-        const { createRoot } = ReactDOM;
-
-        // =========================================================
-        // ★ 外部のアイコンライブラリへの依存を完全にゼロにするため、
-        // SVGデータを直接コンポーネントとして埋め込みました。
-        // これで「lucide is not defined」エラーは絶対に起きません。
-        // =========================================================
-        const IconBase = ({ size = 24, className = "", children, ...props }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLineJoin="round" className={className} {...props}>
-                {children}
-            </svg>
-        );
-
-        const Users = (p) => <IconBase {...p}><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></IconBase>;
-        const CheckSquare = (p) => <IconBase {...p}><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></IconBase>;
-        const Settings = (p) => <IconBase {...p}><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></IconBase>;
-        const LogOut = (p) => <IconBase {...p}><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></IconBase>;
-        const Video = (p) => <IconBase {...p}><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2" ry="2"/></IconBase>;
-        const Edit3 = (p) => <IconBase {...p}><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></IconBase>;
-        const CheckCircle = (p) => <IconBase {...p}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></IconBase>;
-        const AlertCircle = (p) => <IconBase {...p}><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></IconBase>;
-        const ChevronRight = (p) => <IconBase {...p}><polyline points="9 18 15 12 9 6"/></IconBase>;
-        const PlayCircle = (p) => <IconBase {...p}><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></IconBase>;
-        const MessageSquare = (p) => <IconBase {...p}><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></IconBase>;
-        const Play = (p) => <IconBase {...p}><polygon points="5 3 19 12 5 21 5 3"/></IconBase>;
-        const X = (p) => <IconBase {...p}><path d="M18 6 6 18"/><path d="m6 6 12 12"/></IconBase>;
-        const ExternalLink = (p) => <IconBase {...p}><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></IconBase>;
-        const ShieldCheck = (p) => <IconBase {...p}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></IconBase>;
-        const Award = (p) => <IconBase {...p}><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></IconBase>;
-        const Eye = (p) => <IconBase {...p}><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></IconBase>;
-        const EyeOff = (p) => <IconBase {...p}><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></IconBase>;
-        const Camera = (p) => <IconBase {...p}><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></IconBase>;
-        const Menu = (p) => <IconBase {...p}><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></IconBase>;
-        const RefreshCw = (p) => <IconBase {...p}><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></IconBase>;
-
-        // =========================================================
-        // ★ ローカルストレージ（ブラウザの保存領域）を使うための関数
-        // =========================================================
-        const loadData = (key, defaultVal) => {
-            const data = localStorage.getItem(key);
-            return data ? JSON.parse(data) : defaultVal;
+        // ==========================================
+        // 2. アイコンデータ (SVGを直接埋め込み)
+        // ==========================================
+        const icons = {
+            users: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+            settings: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
+            logOut: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>',
+            checkSquare: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>',
+            video: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2" ry="2"/></svg>',
+            edit: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>',
+            checkCircle: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
+            alertCircle: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>',
+            chevronRight: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>',
+            playCircle: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>',
+            messageSquare: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+            play: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>',
+            x: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>',
+            externalLink: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>',
+            shieldCheck: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>',
+            award: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>',
+            camera: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>',
+            menu: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>',
+            refreshCw: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>',
+            eye: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>',
+            eyeOff: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>'
         };
-        const saveData = (key, data) => {
-            localStorage.setItem(key, JSON.stringify(data));
-        };
+
+        function icon(name, size=24, extraClass="") {
+            if(!icons[name]) return '';
+            return icons[name].replace('width="24"', `width="${size}"`).replace('height="24"', `height="${size}"`).replace('<svg ', `<svg class="${extraClass}" `);
+        }
+
+        // ==========================================
+        // 3. データストア・状態管理
+        // ==========================================
         const genId = () => 'id_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
         const getTodayStr = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; };
+        
+        const load = (key, def) => { const d = localStorage.getItem(key); return d ? JSON.parse(d) : def; };
+        const save = (key, data) => localStorage.setItem(key, JSON.stringify(data));
 
         const MILESTONE_TASKS = ['初めてのアポを取る', '初めての受注をする', '2件目のアポを取る', '2件目の受注をする', '3件目 受注する', '4件目 受注する（料金説明までやる）', 'アポインター 卒業する'];
 
-        function App() {
-          const [allProfiles, setAllProfiles] = useState(() => loadData('compass_profiles', []));
-          const [phases, setPhases] = useState(() => loadData('compass_phases', []));
-          const [tasks, setTasks] = useState(() => loadData('compass_tasks', []));
-          const [userTasks, setUserTasks] = useState(() => loadData('compass_userTasks', []));
-          const [settings, setSettings] = useState(() => loadData('compass_settings', { adminSecretKey: 'origin2026' }));
+        let state = {
+            profiles: load('origin_profiles', []),
+            phases: load('origin_phases', []),
+            tasks: load('origin_tasks', []),
+            userTasks: load('origin_userTasks', []),
+            settings: load('origin_settings', { adminSecretKey: 'origin2026' }),
+            currentUser: null,
+            view: 'dashboard',
+            activeTask: null,
+            activeTargetUser: null, // activeUserから修正
+            
+            // UI State
+            authMode: 'login',
+            authRole: 'user',
+            authName: '',
+            authPass: '',
+            authSecret: '',
+            authAvatarUrl: '',
+            authShowPass: false,
+            authError: '',
+            mobileMenuOpen: false,
+            
+            editingTask: null, // editTaskから修正
+            editTaskData: {},
+            newPhaseName: '',
+            newSecretKey: '',
+            testAnswers: {},
+            testResult: null,
+            
+            // Modals
+            confirm: null, // { msg, onConfirm }
+            alert: null,   // string
+        };
 
-          const [userProfile, setUserProfile] = useState(null); 
-          const [loading, setLoading] = useState(true);
-          const [view, setView] = useState('dashboard');
-          const [activeTask, setActiveTask] = useState(null);
-          const [activeTargetUser, setActiveTargetUser] = useState(null);
-          const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-          useEffect(() => {
-            const sid = localStorage.getItem('compass_profile_id');
-            if (sid) {
-              const matched = allProfiles.find(p => p.id === sid);
-              if (matched) {
-                setUserProfile(matched);
-                updateProfile(sid, { lastActiveAt: Date.now() });
-              } else {
-                localStorage.removeItem('compass_profile_id');
-              }
+        // 初期ロード
+        const sid = localStorage.getItem('origin_current_id');
+        if (sid) {
+            state.currentUser = state.profiles.find(p => p.id === sid);
+            if(state.currentUser) {
+                state.currentUser.lastActiveAt = Date.now();
+                save('origin_profiles', state.profiles);
             }
-            setLoading(false);
-          }, []);
+        }
 
-          const updateProfile = (id, data) => {
-            const updated = allProfiles.map(p => p.id === id ? { ...p, ...data } : p);
-            setAllProfiles(updated); saveData('compass_profiles', updated);
-            if (userProfile?.id === id) setUserProfile({ ...userProfile, ...data });
-          };
+        // ==========================================
+        // 4. アプリケーションロジック
+        // ==========================================
+        function showAlert(msg) { state.alert = msg; render(); }
+        function showConfirm(msg, onConfirm) { state.confirm = { msg, onConfirm }; render(); }
+        function closeModals() { state.alert = null; state.confirm = null; render(); }
 
-          const handleRegister = async (name, password, role, avatarUrl) => {
-            if (allProfiles.some(p => p.name === name)) throw new Error("その名前は既に登録されています");
-            const newId = genId();
-            const newP = { id: newId, name, password, role, avatarUrl, lastActiveAt: Date.now(), createdAt: Date.now(), workDays: 0, lastWorkDate: null };
-            const updated = [...allProfiles, newP];
-            setAllProfiles(updated); saveData('compass_profiles', updated);
-            localStorage.setItem('compass_profile_id', newId);
-            setUserProfile(newP);
-            if (role === 'admin' && phases.length === 0) handleSeedData();
-          };
-
-          const handleLogin = async (name, password) => {
-            const matched = allProfiles.find(p => p.name === name && p.password === password);
-            if (matched) {
-              localStorage.setItem('compass_profile_id', matched.id);
-              setUserProfile(matched);
-              updateProfile(matched.id, { lastActiveAt: Date.now() });
-            } else throw new Error("氏名またはパスワードが正しくありません");
-          };
-
-          const handleLogout = () => { localStorage.removeItem('compass_profile_id'); setUserProfile(null); setMobileMenuOpen(false); };
-
-          const handleSeedData = () => {
+        function seedData() {
             const pData = [
-              {
-                name: 'フェーズ1: 入社準備と基礎インプット',
-                tasks: [
-                  { type: 'link', title: '従業員名簿作成フォームを入力', content: 'https://forms.gle/' },
-                  { type: 'video', title: 'ロープレ動画を視聴する', content: 'https://www.w3schools.com/html/mov_bbb.mp4' },
-                  { type: 'test', title: 'ロープレテスト', content: JSON.stringify({ passScore: 100, questions: [{q: "ロープレ内容の確認テスト（※後で管理者が編集してください）", options:["はい","いいえ"], answer:0}] }) },
-                  { type: 'normal', title: 'Gmailアカウント作成' },
-                  { type: 'normal', title: 'エルリード名簿登録' },
-                  { type: 'normal', title: '業務委託証の写真を提出' },
-                  { type: 'link', title: '月間計画表を記入', content: 'https://docs.google.com/spreadsheets/' },
-                  { type: 'link', title: '各Lineグループに追加', content: 'https://line.me/' },
-                  { type: 'link', title: 'ドロボのアカウントに登録', content: 'https://example.com/dorobo' },
-                  { type: 'link', title: 'Googleマップのアカウントに登録', content: 'https://maps.google.com/' },
-                  { type: 'link', title: 'ポチポチロガーのアプリに登録', content: 'https://example.com/logger' },
-                  { type: 'normal', title: 'コンプライアンス研修を受ける' },
-                  { type: 'normal', title: '法律遵守 研修' },
-                  { type: 'video', title: '自社商材研修の動画を視聴する', content: 'https://www.w3schools.com/html/mov_bbb.mp4' },
-                  { type: 'test', title: '商材テストに合格する', content: JSON.stringify({ passScore: 100, questions: [{q: "商材テストの確認（※後で管理者が編集してください）", options:["はい","いいえ"], answer:0}] }) },
-                ]
-              },
-              {
-                name: 'フェーズ2: 実践準備と初稼働',
-                tasks: [
-                  { type: 'normal', title: 'クローザーの同行に行く' },
-                  { type: 'normal', title: 'ドロボの書き方を教えてもらう' },
-                  { type: 'normal', title: 'リスト出し、エリア選びのやり方を勉強する' },
-                  { type: 'text', title: '同行後 感じたこと 気になることをメモに書いて 上層部に送信' },
-                  { type: 'normal', title: '1人で稼働してみる' },
-                  { type: 'text', title: '稼働してみて思ったこと、良かったこと、悪かったこと、わからなかったことを言語化してみる' },
-                  { type: 'normal', title: 'アウト返し集 の知識を入れる' },
-                  { type: 'normal', title: '初めてのアポを取る' },
-                  { type: 'text', title: 'どうしたら契約が取れるか 何が必要か 何が足りないかを言語化して送信する' },
-                  { type: 'normal', title: '初めての受注をする' },
-                ]
-              },
-              {
-                name: 'フェーズ3: アポインター卒業へ',
-                tasks: [
-                  { type: 'normal', title: '他社の商材知識を入れる' },
-                  { type: 'normal', title: '2件目のアポを取る' },
-                  { type: 'normal', title: '2件目の受注をする' },
-                  { type: 'normal', title: '3件目 受注する' },
-                  { type: 'video', title: '紙プレ動画を見る', content: 'https://www.w3schools.com/html/mov_bbb.mp4' },
-                  { type: 'test', title: '紙プレの ロープレテストへ 合格', content: JSON.stringify({ passScore: 100, questions: [{q: "紙プレテストの確認（※後で管理者が編集してください）", options:["はい","いいえ"], answer:0}] }) },
-                  { type: 'normal', title: '4件目 受注する（料金説明までやる）' },
-                  { type: 'video', title: 'アトカクフォームの書き方と投げ方の動画を見る', content: 'https://www.w3schools.com/html/mov_bbb.mp4' },
-                  { type: 'normal', title: 'アポインター 卒業する' },
-                ]
-              },
-              {
-                name: 'フェーズ4: クローザーへの道',
-                tasks: [
-                  { type: 'video', title: 'クローザー用 ロープレ動画を見る', content: 'https://www.w3schools.com/html/mov_bbb.mp4' },
-                  { type: 'test', title: 'クローザー用 ロープレテストへ 合格する', content: JSON.stringify({ passScore: 100, questions: [{q: "クローザーテストの確認（※後で管理者が編集してください）", options:["はい","いいえ"], answer:0}] }) },
-                  { type: 'normal', title: 'クローザー として稼働する' },
-                  { type: 'normal', title: '商材知識 を増やす （UQトスアップや 電気トスアップについて）' },
-                  { type: 'video', title: 'だるい系客用の ロープレ動画を見る', content: 'https://www.w3schools.com/html/mov_bbb.mp4' },
-                  { type: 'normal', title: '細かい営業テクニックとアウトの引き出しを増やす' },
-                ]
-              }
+              { name: 'フェーズ1: 入社準備', tasks: [{type:'link', title:'名簿作成', content:'https://google.com'}, {type:'test', title:'理解度テスト', content:'{"passScore":100,"questions":[{"q":"準備はOK？","options":["はい","いいえ"],"answer":0}]}'}] },
+              { name: 'フェーズ2: 初稼働', tasks: [{type:'normal', title:'初めてのアポを取る'}, {type:'text', title:'稼働の振り返り'}, {type:'video', title:'ロープレ動画', content:'https://www.w3schools.com/html/mov_bbb.mp4'}] },
+              { name: 'フェーズ3: アポインター卒業', tasks: [{type:'normal', title:'2件目のアポを取る'}, {type:'normal', title:'初めての受注をする'}, {type:'normal', title:'アポインター 卒業する'}] },
+              { name: 'フェーズ4: クローザーへの道', tasks: [{type:'video', title:'クローザー動画', content:'https://www.w3schools.com/html/mov_bbb.mp4'}, {type:'normal', title:'クローザー として稼働する'}] }
             ];
-
-            let newPhases = [...phases];
-            let newTasks = [...tasks];
-            const maxOrder = newPhases.length > 0 ? Math.max(...newPhases.map(p => p.order)) : 0;
-
+            
+            let newPh = [], newTk = [];
             pData.forEach((p, i) => {
-              const pId = genId();
-              newPhases.push({ id: pId, name: p.name, order: maxOrder + i + 1 });
-              p.tasks.forEach((t, j) => {
-                newTasks.push({ id: genId(), phaseId: pId, order: j + 1, ...t });
-              });
+                const pid = genId();
+                newPh.push({ id: pid, name: p.name, order: i+1 });
+                p.tasks.forEach((t, j) => { newTk.push({ id: genId(), phaseId: pid, order: j+1, ...t }); });
             });
-            setPhases(newPhases); saveData('compass_phases', newPhases);
-            setTasks(newTasks); saveData('compass_tasks', newTasks);
-          };
+            state.phases = newPh; save('origin_phases', state.phases);
+            state.tasks = newTk; save('origin_tasks', state.tasks);
+            render();
+        }
 
-          const addPhase = (name) => {
-            const updated = [...phases, { id: genId(), name, order: phases.length + 1 }];
-            setPhases(updated); saveData('compass_phases', updated);
-          };
-          const deletePhase = (id) => {
-            const updated = phases.filter(p => p.id !== id);
-            setPhases(updated); saveData('compass_phases', updated);
-            const updatedTasks = tasks.filter(t => t.phaseId !== id);
-            setTasks(updatedTasks); saveData('compass_tasks', updatedTasks);
-          };
-          const addTask = (phaseId, title, type, content) => {
-            const updated = [...tasks, { id: genId(), phaseId, title, type, content: content||'', order: tasks.length + 1 }];
-            setTasks(updated); saveData('compass_tasks', updated);
-          };
-          const updateTask = (id, data) => {
-            const updated = tasks.map(t => t.id === id ? { ...t, ...data } : t);
-            setTasks(updated); saveData('compass_tasks', updated);
-          };
-          const deleteTask = (id) => {
-            const updated = tasks.filter(t => t.id !== id);
-            setTasks(updated); saveData('compass_tasks', updated);
-          };
+        function handleStartWork() {
+            if(state.currentUser.lastWorkDate === getTodayStr()) return;
+            state.currentUser.lastWorkDate = getTodayStr();
+            state.currentUser.workDays = (state.currentUser.workDays || 0) + 1;
+            save('origin_profiles', state.profiles);
+            render();
+        }
 
-          const addUserTask = (data) => {
-            const updated = [...userTasks, { id: genId(), ...data }];
-            setUserTasks(updated); saveData('compass_userTasks', updated);
-          };
-          const updateUserTask = (id, data) => {
-            const updated = userTasks.map(ut => ut.id === id ? { ...ut, ...data } : ut);
-            setUserTasks(updated); saveData('compass_userTasks', updated);
-          };
+        function completeTask(taskId, extra = {}) {
+            const existing = state.userTasks.find(u => u.taskId === taskId && u.userId === state.currentUser.id);
+            const tk = state.tasks.find(t=>t.id===taskId);
+            
+            const data = { 
+                userId: state.currentUser.id, taskId, 
+                isCompleted: tk.type !== 'text', 
+                completedAt: Date.now(), 
+                workDaysAtCompletion: state.currentUser.workDays || 0,
+                ...extra 
+            };
+            
+            if(existing) { Object.assign(existing, data); } 
+            else { state.userTasks.push({ id: genId(), ...data }); }
+            
+            save('origin_userTasks', state.userTasks);
+            state.view = 'dashboard';
+            state.activeTask = null;
+            render();
+        }
 
-          const updateSettings = (data) => {
-            const updated = { ...settings, ...data };
-            setSettings(updated); saveData('compass_settings', updated);
-          };
+        // ==========================================
+        // 5. 描画 (レンダリング)
+        // ==========================================
+        function escapeHTML(str) {
+            if(str == null) return '';
+            return String(str).replace(/[&<>'"]/g, tag => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[tag] || tag));
+        }
 
-          if (loading) return <div className="h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-zinc-900"></div></div>;
-          if (!userProfile) return <AuthScreen onLogin={handleLogin} onRegister={handleRegister} currentSecret={settings.adminSecretKey} />;
+        function renderBadge(text, color) {
+            const cls = color === 'red' ? 'badge-red' : color === 'amber' ? 'badge-amber' : color === 'emerald' ? 'badge-emerald' : 'badge-gray';
+            return `<span class="badge ${cls}">${text}</span>`;
+        }
 
-          const newbies = allProfiles.filter(u => u.role === 'user');
-
-          return (
-            <div className="min-h-screen flex flex-col md:flex-row animate-in">
-              <nav className="hidden md:flex w-64 flex-col bg-white border-r border-zinc-200 p-5 shadow-sm">
-                <h1 className="text-2xl font-black mb-10 tracking-tighter">ORIGIN<span className="text-zinc-400 text-sm ml-1 uppercase">Compass</span></h1>
-                <div className="flex-1 space-y-2">
-                  <NavItem icon={<Users size={18}/>} label="ダッシュボード" active={view==='dashboard'} onClick={()=>setView('dashboard')} />
-                  {userProfile.role === 'admin' && <NavItem icon={<Settings size={18}/>} label="管理設定" active={view==='manage'} onClick={()=>setView('manage')} />}
+        function renderAuth() {
+            const isLogin = state.authMode === 'login';
+            return `
+            <div class="min-h-screen bg-zinc-50 flex items-center justify-center p-4 animate-in w-full">
+              <div class="bg-white rounded-3xl shadow-xl w-full max-w-md overflow-hidden border border-zinc-200">
+                <div class="p-8 border-b border-zinc-100 text-center">
+                  <h1 class="text-3xl font-black tracking-tight">ORIGIN</h1><p class="text-xs font-bold text-zinc-400 uppercase tracking-widest mt-1">Management Platform</p>
                 </div>
-                <div className="mt-auto p-4 bg-zinc-50 rounded-2xl border border-zinc-100 flex flex-col gap-2">
-                   {userProfile.role === 'admin' && (
-                     <button onClick={() => window.location.reload()} className="w-full flex items-center justify-center gap-2 p-2 rounded-xl text-xs font-bold text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900 transition-colors">
-                       <RefreshCw size={14}/> 最新版に更新
-                     </button>
-                   )}
-                   <div className="flex items-center justify-between mt-2 pt-3 border-t border-zinc-200">
-                     <div className="flex items-center gap-3 overflow-hidden">
-                       <div className="w-10 h-10 rounded-full bg-zinc-900 overflow-hidden shrink-0 shadow-sm border border-white flex items-center justify-center text-white font-bold">
-                          {userProfile.avatarUrl ? <img src={userProfile.avatarUrl} className="w-full h-full object-cover"/> : userProfile.name[0]}
+                <div class="p-8 space-y-5 text-left">
+                  <h3 class="text-sm font-bold text-center mb-2">${isLogin ? 'システムにログイン' : '新規アカウント登録'}</h3>
+                  ${state.authError ? `<div class="bg-red-50 text-red-600 p-3 rounded-xl text-sm font-bold text-center border border-red-200">${state.authError}</div>` : ''}
+                  
+                  <div>
+                    <label class="text-xs font-bold text-zinc-500 uppercase mb-1 flex">Name</label>
+                    <input type="text" id="authName" placeholder="氏名を入力" value="${escapeHTML(state.authName)}" />
+                  </div>
+                  <div class="relative">
+                    <label class="text-xs font-bold text-zinc-500 uppercase mb-1 flex">Password</label>
+                    <input type="${state.authShowPass ? 'text' : 'password'}" id="authPass" placeholder="パスワード" value="${escapeHTML(state.authPass)}" />
+                    <button type="button" data-action="toggle-pass" class="absolute right-4 bottom-4 text-zinc-400 hover:text-zinc-900">${icon(state.authShowPass ? 'eyeOff' : 'eye', 18)}</button>
+                  </div>
+
+                  ${!isLogin ? `
+                  <div class="space-y-5 pt-2 animate-in">
+                    <div>
+                      <label class="text-xs font-bold text-zinc-500 uppercase mb-2 flex">Profile Picture</label>
+                      <div class="flex items-center gap-4">
+                        <div class="w-16 h-16 rounded-full bg-zinc-100 border border-zinc-200 flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
+                           ${state.authAvatarUrl ? `<img src="${state.authAvatarUrl}" class="w-full h-full object-cover"/>` : icon('camera', 24, 'text-zinc-400')}
+                        </div>
+                        <label class="cursor-pointer bg-white border border-zinc-200 px-4 py-2 rounded-xl text-sm font-bold shadow-sm hover:bg-zinc-50 transition-colors">写真を選択<input type="file" id="avatarUpload" class="hidden" accept="image/*"/></label>
+                      </div>
+                    </div>
+                    <div>
+                      <label class="text-xs font-bold text-zinc-500 uppercase mb-2 flex">Role</label>
+                      <div class="grid grid-cols-2 gap-3">
+                        <button type="button" data-action="set-role" data-role="user" class="p-3 rounded-xl border-2 text-sm font-bold ${state.authRole==='user'?'bg-zinc-900 text-white border-zinc-900':'bg-white text-zinc-500 hover:border-zinc-300'}">新人</button>
+                        <button type="button" data-action="set-role" data-role="admin" class="p-3 rounded-xl border-2 text-sm font-bold ${state.authRole==='admin'?'bg-zinc-900 text-white border-zinc-900':'bg-white text-zinc-500 hover:border-zinc-300'}">管理者</button>
+                      </div>
+                    </div>
+                    ${state.authRole === 'admin' ? `
+                      <div>
+                        <label class="text-xs font-bold text-zinc-900 mb-1 flex items-center gap-1">${icon('shieldCheck',14)}シークレットキー</label>
+                        <input type="password" id="authSecret" placeholder="管理者キーを入力" value="${escapeHTML(state.authSecret)}" class="border-amber-300 focus:border-amber-500"/>
+                      </div>
+                    ` : ''}
+                  </div>
+                  ` : ''}
+
+                  <button type="button" data-action="submit-auth" class="btn-primary mt-4 py-4">${isLogin ? 'ログイン' : '登録して開始'}</button>
+                  <div class="text-center mt-4">
+                    <button type="button" data-action="switch-auth" class="text-sm font-bold text-zinc-500 hover:text-zinc-900 underline">${isLogin ? '新規アカウント作成はこちら' : 'ログイン画面に戻る'}</button>
+                  </div>
+                </div>
+              </div>
+            </div>`;
+        }
+
+        function renderSidebar() {
+            const isAdmin = state.currentUser.role === 'admin';
+            const v = state.view;
+            return `
+              <nav class="sidebar z-10">
+                <div class="pb-6 mb-2 border-b border-zinc-100">
+                  <h1 class="text-2xl font-black tracking-tight flex items-center gap-1">ORIGIN<span class="text-xs text-zinc-400 font-bold uppercase mt-1">Compass</span></h1>
+                </div>
+                <div class="flex-1 space-y-1 py-2">
+                  <button data-action="nav" data-view="dashboard" class="nav-item ${v==='dashboard'?'active':''}">${icon('users',18)} ダッシュボード</button>
+                  ${isAdmin ? `<button data-action="nav" data-view="manage" class="nav-item ${v==='manage'?'active':''}">${icon('settings',18)} 管理設定</button>` : ''}
+                </div>
+                <div class="mt-auto bg-zinc-50 p-4 rounded-2xl border border-zinc-200">
+                   ${isAdmin ? `<button data-action="reload" class="w-full flex justify-center items-center gap-2 p-2 mb-2 text-xs font-bold text-zinc-500 hover:text-zinc-900 transition-colors">${icon('refreshCw', 14)} 最新版に更新</button>` : ''}
+                   <div class="flex items-center justify-between ${isAdmin?'pt-3 border-t border-zinc-200':''}">
+                     <div class="flex items-center gap-3 overflow-hidden">
+                       <div class="w-10 h-10 rounded-full bg-zinc-900 flex items-center justify-center text-white font-bold shrink-0 overflow-hidden">
+                          ${state.currentUser.avatarUrl ? `<img src="${state.currentUser.avatarUrl}" class="w-full h-full object-cover"/>` : state.currentUser.name[0]}
                        </div>
-                       <div className="truncate"><p className="text-sm font-black truncate">{userProfile.name}</p><p className="text-[10px] font-bold text-zinc-400">{userProfile.role}</p></div>
+                       <div class="truncate"><p class="text-sm font-black truncate">${escapeHTML(state.currentUser.name)}</p><p class="text-xs text-zinc-500 font-bold">${isAdmin?'管理者':'新人'}</p></div>
                      </div>
-                     <button onClick={handleLogout} className="text-zinc-400 hover:text-zinc-900 transition-colors"><LogOut size={18}/></button>
+                     <button data-action="logout" class="text-zinc-400 hover:text-zinc-900 transition-colors">${icon('logOut', 18)}</button>
                    </div>
                 </div>
               </nav>
-
-              <div className="md:hidden bg-white border-b border-zinc-200 p-4 flex items-center justify-between sticky top-0 z-30">
-                <h1 className="text-xl font-black tracking-tighter">ORIGIN <span className="text-zinc-400 text-xs">COMPASS</span></h1>
-                <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="p-2 text-zinc-600"><Menu size={24} /></button>
-              </div>
-
-              {mobileMenuOpen && (
-                <div className="md:hidden fixed inset-0 bg-white z-40 p-6 animate-in z-50">
-                  <div className="flex justify-between items-center mb-8"><h1 className="text-xl font-black">Menu</h1><button onClick={() => setMobileMenuOpen(false)}><X size={24} /></button></div>
-                  <div className="space-y-4">
-                    <button onClick={() => { setView('dashboard'); setMobileMenuOpen(false); }} className={`w-full flex items-center gap-3 p-4 rounded-xl font-bold ${view==='dashboard'?'bg-zinc-900 text-white':'bg-zinc-50'}`}><Users size={20}/> ダッシュボード</button>
-                    {userProfile.role === 'admin' && <button onClick={() => { setView('manage'); setMobileMenuOpen(false); }} className={`w-full flex items-center gap-3 p-4 rounded-xl font-bold ${view==='manage'?'bg-zinc-900 text-white':'bg-zinc-50'}`}><Settings size={20}/> 管理設定</button>}
-                    <div className="pt-8 mt-8 border-t border-zinc-100 space-y-4">
-                      {userProfile.role === 'admin' && (
-                        <button onClick={() => window.location.reload()} className="w-full flex items-center gap-3 p-4 rounded-xl font-bold text-zinc-600 bg-zinc-100"><RefreshCw size={20}/> 最新版に更新</button>
-                      )}
-                      <button onClick={handleLogout} className="w-full flex items-center gap-3 p-4 rounded-xl font-bold text-red-600 bg-red-50"><LogOut size={20}/> ログアウト</button>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              <main className="flex-1 p-4 md:p-10 overflow-auto max-w-6xl mx-auto w-full">
-                {view === 'dashboard' && userProfile.role === 'admin' && <AdminDashboard users={newbies} tasks={tasks} userTasks={userTasks} phases={phases} onSelectUser={u => {setActiveTargetUser(u); setView('userDetail');}} />}
-                {view === 'dashboard' && userProfile.role === 'user' && <UserDashboard user={userProfile} phases={phases} tasks={tasks} userTasks={userTasks} onSelectTask={t => {setActiveTask(t); setView('taskExec');}} updateProfile={updateProfile} />}
-                
-                {view === 'manage' && userProfile.role === 'admin' && <PhaseManagement phases={phases} tasks={tasks} onSeed={handleSeedData} adminSecretKey={settings.adminSecretKey} updateSettings={updateSettings} addPhase={addPhase} deletePhase={deletePhase} addTask={addTask} updateTask={updateTask} deleteTask={deleteTask} />}
-                
-                {view === 'userDetail' && <UserDetailView user={activeTargetUser} phases={phases} tasks={tasks} userTasks={userTasks} onBack={() => setView('dashboard')} updateUserTask={updateUserTask} />}
-                {view === 'taskExec' && <TaskExecutor task={activeTask} user={userProfile} userTasks={userTasks} onBack={() => setView('dashboard')} addUserTask={addUserTask} updateUserTask={updateUserTask} />}
-              </main>
-            </div>
-          );
-        }
-
-        const NavItem = ({ icon, label, active, onClick }) => (
-          <button onClick={onClick} className={`w-full flex items-center gap-3 px-5 py-3.5 rounded-2xl font-bold text-sm transition-all ${active ? 'bg-zinc-900 text-white shadow-xl shadow-zinc-200' : 'text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900'}`}>{icon}{label}</button>
-        );
-
-        const Badge = ({ children, color }) => {
-          const cls = color === 'red' ? 'bg-red-50 text-red-600 border-red-100' : color === 'amber' ? 'bg-amber-50 text-amber-600 border-amber-100' : 'bg-zinc-100 text-zinc-600 border-zinc-200';
-          return <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black border uppercase tracking-tighter shadow-sm ${cls}`}>{children}</span>;
-        }
-
-        const AuthScreen = ({ onLogin, onRegister, currentSecret }) => {
-          const [mode, setMode] = useState('login');
-          const [name, setName] = useState('');
-          const [pass, setPass] = useState('');
-          const [show, setShow] = useState(false);
-          const [role, setRole] = useState('user');
-          const [secret, setSecret] = useState('');
-          const [avatar, setAvatar] = useState('');
-          const [err, setErr] = useState('');
-          const [loading, setLoading] = useState(false);
-
-          const handleImage = (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-            const r = new FileReader();
-            r.onload = (ev) => {
-              const img = new Image();
-              img.onload = () => {
-                const canvas = document.createElement('canvas');
-                const MAX = 150; let w = img.width, h = img.height;
-                if (w > h) { if (w > MAX) { h *= MAX / w; w = MAX; } } else { if (h > MAX) { w *= MAX / h; h = MAX; } }
-                canvas.width = w; canvas.height = h;
-                canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-                setAvatar(canvas.toDataURL('image/jpeg', 0.8));
-              };
-              img.src = ev.target.result;
-            };
-            r.readAsDataURL(file);
-          };
-
-          return (
-            <div className="min-h-screen flex items-center justify-center bg-zinc-50 p-6 animate-in">
-              <div className="bg-white p-10 rounded-[2.5rem] shadow-2xl w-full max-w-md border border-zinc-100">
-                <div className="text-center mb-10"><h2 className="text-4xl font-black tracking-tighter">ORIGIN</h2><p className="text-zinc-400 font-bold text-[10px] uppercase tracking-[0.2em]">Management Platform</p></div>
-                {err && <div className="bg-red-50 text-red-600 p-4 rounded-2xl text-xs font-bold mb-6 text-center animate-in">{err}</div>}
-                <div className="space-y-5">
-                  <input type="text" placeholder="氏名を入力" className="w-full p-5 bg-zinc-50 border border-zinc-200 rounded-2xl font-bold focus:ring-2 focus:ring-zinc-900 outline-none transition-all" onChange={e=>setName(e.target.value)} />
-                  <div className="relative">
-                    <input type={show?"text":"password"} placeholder="パスワード" className="w-full p-5 bg-zinc-50 border border-zinc-200 rounded-2xl font-bold focus:ring-2 focus:ring-zinc-900 outline-none transition-all" onChange={e=>setPass(e.target.value)} />
-                    <button className="absolute right-5 top-5 text-zinc-400" onClick={()=>setShow(!show)}>{show?<EyeOff size={20}/>:<Eye size={20}/>}</button>
-                  </div>
-                  {mode === 'new' && (
-                    <div className="space-y-6 pt-2 animate-in">
-                       <div>
-                         <p className="text-[10px] font-black text-zinc-400 uppercase mb-3 tracking-widest ml-1">Profile Avatar</p>
-                         <div className="flex items-center gap-5">
-                            <div className="w-20 h-20 rounded-full bg-zinc-100 flex items-center justify-center overflow-hidden border-2 border-zinc-200 shadow-inner">{avatar ? <img src={avatar} className="w-full h-full object-cover"/> : <Camera className="text-zinc-300" size={32}/>}</div>
-                            <label className="text-xs font-black cursor-pointer bg-white border border-zinc-200 px-6 py-3.5 rounded-2xl shadow-sm hover:bg-zinc-50 transition-colors">写真を選択<input type="file" className="hidden" accept="image/*" onChange={handleImage}/></label>
-                         </div>
-                       </div>
-                       <div>
-                         <p className="text-[10px] font-black text-zinc-400 uppercase mb-3 tracking-widest ml-1">Account Role</p>
-                         <div className="grid grid-cols-2 gap-3">
-                            <button onClick={()=>setRole('user')} className={`p-4 rounded-2xl border-2 font-black text-sm transition-all ${role==='user'?'bg-zinc-900 text-white border-zinc-900 shadow-lg':'bg-zinc-50 text-zinc-400 border-zinc-100 hover:border-zinc-300'}`}>新人</button>
-                            <button onClick={()=>setRole('admin')} className={`p-4 rounded-2xl border-2 font-black text-sm transition-all ${role==='admin'?'bg-zinc-900 text-white border-zinc-900 shadow-lg':'bg-zinc-50 text-zinc-400 border-zinc-100 hover:border-zinc-300'}`}>管理者</button>
-                         </div>
-                       </div>
-                       {role==='admin' && <input type="password" placeholder="管理者シークレットキー" className="w-full p-5 bg-white border-2 border-amber-300 focus:ring-2 focus:ring-amber-500 rounded-2xl font-bold outline-none animate-in" onChange={e=>setSecret(e.target.value)} />}
-                    </div>
-                  )}
-                  <button disabled={loading} className="w-full py-5 bg-zinc-900 text-white font-black text-lg rounded-2xl shadow-xl mt-4 active:scale-95 transition-all disabled:opacity-50" onClick={async () => {
-                    setLoading(true); setErr('');
-                    try {
-                        if (mode === 'login') await onLogin(name, pass);
-                        else {
-                          if (role==='admin' && secret !== currentSecret) { setErr("管理者シークレットキーが正しくありません"); setLoading(false); return; }
-                          await onRegister(name, pass, role, avatar);
-                        }
-                    } catch(e) { setErr(e.message); }
-                    finally { setLoading(false); }
-                  }}>{loading?'処理中...':(mode==='login'?'ログイン':'登録して開始')}</button>
-                </div>
-                <button onClick={()=>setMode(mode==='login'?'new':'login')} className="w-full text-center mt-8 text-sm text-zinc-400 font-bold hover:text-zinc-900 transition-colors">{mode==='login'?'新規作成はこちら →':'← ログインに戻る'}</button>
-              </div>
-            </div>
-          );
-        };
-
-        const AdminDashboard = ({ users, tasks, userTasks, phases, onSelectUser }) => {
-          const calcProgress = (uid) => { const c = userTasks.filter(ut => ut.userId === uid && ut.isCompleted).length; return tasks.length ? Math.round((c / tasks.length) * 100) : 0; };
-          const pTexts = userTasks.filter(ut => { const t = tasks.find(x => x.id === ut.taskId); return t?.type === 'text' && ut.textAnswer && !ut.adminComment; }).length;
-
-          return (
-            <div className="space-y-10 animate-in">
-              <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-zinc-200 pb-8">
-                <div><h2 className="text-4xl font-black tracking-tighter">組織全体の進捗</h2><p className="text-zinc-400 font-bold text-sm mt-2 uppercase tracking-widest">Global Dashboard</p></div>
-                {pTexts > 0 && <div className="bg-amber-50 text-amber-600 px-6 py-4 rounded-2xl border border-amber-200 font-black text-sm flex items-center gap-3 animate-pulse shadow-sm"><MessageSquare size={20}/> 未承認の言語化が {pTexts} 件あります</div>}
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-white p-8 rounded-[2.5rem] border border-zinc-200 shadow-sm flex justify-between items-center group hover:border-zinc-900 transition-colors">
-                  <div><p className="text-[10px] text-zinc-400 font-black uppercase tracking-widest mb-2">Active Newbies</p><p className="text-5xl font-black">{users.length}<span className="text-lg text-zinc-400 ml-1">名</span></p></div>
-                  <div className="w-16 h-16 bg-zinc-100 rounded-2xl flex items-center justify-center text-zinc-900 group-hover:bg-zinc-900 group-hover:text-white transition-all shadow-inner"><Users size={32}/></div>
-                </div>
-                <div className="bg-white p-8 rounded-[2.5rem] border border-zinc-200 shadow-sm flex justify-between items-center group hover:border-red-400 transition-colors">
-                  <div><p className="text-[10px] text-zinc-400 font-black uppercase tracking-widest mb-2">Alerts (3d inactive)</p><p className="text-5xl font-black text-red-600">{users.filter(u=>(Date.now()-(u.lastActiveAt||0))>259200000).length}<span className="text-lg ml-1">名</span></p></div>
-                  <div className="w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center text-red-600 group-hover:bg-red-600 group-hover:text-white transition-all shadow-inner"><AlertCircle size={32}/></div>
-                </div>
-              </div>
-              <div className="bg-white rounded-[2.5rem] border border-zinc-200 overflow-hidden shadow-sm">
-                <div className="bg-zinc-50 px-8 py-6 border-b border-zinc-100 text-[10px] font-black text-zinc-400 uppercase tracking-widest flex justify-between">
-                   <span>新人一覧</span>
-                   <span>進捗率 / 稼働日数</span>
-                </div>
-                <div className="divide-y divide-zinc-100">
-                  {users.map(u => (
-                    <div key={u.id} className="px-8 py-6 flex items-center justify-between hover:bg-zinc-50 cursor-pointer group transition-colors" onClick={()=>onSelectUser(u)}>
-                      <div className="flex items-center gap-5">
-                        <div className="w-16 h-16 rounded-full bg-zinc-100 overflow-hidden">{u.avatarUrl ? <img src={u.avatarUrl} className="w-full h-full object-cover"/> : <div className="w-full h-full flex items-center justify-center font-bold">{u.name[0]}</div>}</div>
-                        <div><p className="font-black text-xl flex items-center gap-2">{u.name} {(Date.now()-(u.lastActiveAt||0))>259200000 && <Badge color="red">警告</Badge>}</p><p className="text-xs text-zinc-400 font-bold mt-1">最終: {new Date(u.lastActiveAt).toLocaleString()}</p></div>
-                      </div>
-                      <div className="text-right"><p className="text-3xl font-black">{calcProgress(u.id)}%</p><p className="text-[10px] font-black text-zinc-400">稼働 {u.workDays||0}日目</p></div>
-                    </div>
-                  ))}
-                  {users.length === 0 && <div className="p-20 text-center text-zinc-300 font-bold">新人がいません</div>}
-                </div>
-              </div>
-            </div>
-          );
-        };
-
-        const UserDashboard = ({ user, phases, tasks, userTasks, onSelectTask, updateProfile }) => {
-          const cCount = userTasks.filter(ut => ut.userId === user.id && ut.isCompleted).length;
-          const progress = tasks.length ? Math.round((cCount / tasks.length) * 100) : 0;
-          const today = getTodayStr();
-          const [updating, setUpdating] = useState(false);
-          
-          let nextTask = null;
-          for (const phase of phases) {
-            const pTasks = tasks.filter(t => t.phaseId === phase.id);
-            for (const task of pTasks) {
-               const ut = userTasks.find(u => u.taskId === task.id && u.userId === user.id);
-               if (!ut || !ut.isCompleted) { nextTask = task; break; }
-            }
-            if (nextTask) break;
-          }
-          
-          const startWork = () => {
-             setUpdating(true);
-             updateProfile(user.id, { lastWorkDate: today, workDays: Number(user.workDays || 0) + 1 });
-             setUpdating(false);
-          };
-
-          return (
-            <div className="max-w-3xl mx-auto space-y-10 animate-in pb-20">
-              <div className="bg-white p-10 rounded-[2.5rem] border border-zinc-200 shadow-sm relative overflow-hidden">
-                <div className="absolute top-0 right-0 p-10 opacity-5 pointer-events-none"><PlayCircle size={180}/></div>
-                <p className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.3em] mb-4">Origin Compass Roadmap</p>
-                <h2 className="text-5xl font-black tracking-tighter mb-10">{user.name}</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <div className="bg-zinc-900 p-8 rounded-[2rem] text-white shadow-2xl shadow-zinc-300">
-                    <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-3">Total Progress</p>
-                    <div className="flex items-end gap-2 mb-6"><span className="text-7xl font-black tracking-tighter leading-none">{progress}</span><span className="text-xl font-bold mb-2">%</span></div>
-                    <div className="w-full bg-zinc-800 h-2 rounded-full overflow-hidden mt-2"><div className="bg-white h-full transition-all duration-1000" style={{width: `${progress}%`}}></div></div>
-                  </div>
-                  <div className="bg-zinc-50 p-8 rounded-[2rem] border border-zinc-100 flex flex-col justify-between">
-                    <div><p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-2">Total Work Days</p><p className="text-5xl font-black text-zinc-900 tracking-tighter">{user.workDays || 0} <span className="text-sm font-bold text-zinc-400">Days</span></p></div>
-                    <div className="mt-6 pt-6 border-t border-zinc-200">
-                      {user.lastWorkDate === today ? <div className="bg-emerald-50 text-emerald-700 px-5 py-4 rounded-2xl text-xs font-black border border-emerald-200 flex items-center justify-center gap-2 shadow-sm"><CheckCircle size={18}/> 本日稼働中</div> : <button disabled={updating} onClick={startWork} className="w-full bg-zinc-900 text-white py-4 rounded-2xl text-sm font-black shadow-lg active:scale-95 transition-all disabled:opacity-50">本日の稼働を記録する</button>}
-                    </div>
-                  </div>
-                </div>
+              
+              <div class="mobile-header">
+                <h1 class="text-xl font-black tracking-tight">ORIGIN <span class="text-xs text-zinc-400">COMPASS</span></h1>
+                <button data-action="toggle-menu" class="text-zinc-600 hover:text-zinc-900">${icon('menu', 24)}</button>
               </div>
               
-              {nextTask && (
-                <div className="bg-zinc-900 p-10 rounded-[2.5rem] shadow-xl transform transition-all hover:-translate-y-2 cursor-pointer group border border-zinc-800 relative overflow-hidden" onClick={() => onSelectTask(nextTask)}>
-                  <div className="absolute inset-0 bg-gradient-to-r from-zinc-800/0 via-zinc-800/50 to-zinc-800/0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 transform -skew-x-12"></div>
-                  <div className="relative z-10">
-                    <div className="flex items-center gap-3 mb-6"><span className="bg-white text-zinc-900 text-[10px] font-black px-4 py-2 rounded-full shadow-sm flex items-center gap-2 tracking-widest uppercase"><PlayCircle size={16}/> Next Action</span></div>
-                    <h3 className="text-3xl md:text-4xl font-black text-white mb-8 leading-tight tracking-tighter">{nextTask.title}</h3>
-                    <div className="flex items-center justify-between text-sm text-zinc-400 font-bold border-t border-zinc-800 pt-6">
-                       <span className="flex items-center gap-2 bg-zinc-800 px-4 py-2 rounded-xl border border-zinc-700">{nextTask.type === 'video' ? <Video size={18}/> : nextTask.type === 'text' ? <Edit3 size={18}/> : <CheckSquare size={18}/>} アクションを開始</span>
-                       <span className="text-white font-black flex items-center gap-1 group-hover:translate-x-2 transition-transform text-lg">開く <ChevronRight size={24}/></span>
+              ${state.mobileMenuOpen ? `
+              <div class="mobile-menu animate-in">
+                 <div class="flex justify-between items-center mb-8"><h2 class="text-2xl font-black">Menu</h2><button data-action="toggle-menu" class="text-zinc-500 hover:text-zinc-900">${icon('x',24)}</button></div>
+                 <div class="space-y-4 flex-1">
+                    <button data-action="nav" data-view="dashboard" class="nav-item ${v==='dashboard'?'active':''}">${icon('users',20)} ダッシュボード</button>
+                    ${isAdmin ? `<button data-action="nav" data-view="manage" class="nav-item ${v==='manage'?'active':''}">${icon('settings',20)} 管理設定</button>` : ''}
+                 </div>
+                 <div class="pt-6 border-t border-zinc-200 space-y-3">
+                    ${isAdmin ? `<button data-action="reload" class="btn-primary" style="background:var(--zinc-100);color:var(--zinc-900)">${icon('refreshCw',20)} 最新版に更新</button>` : ''}
+                    <button data-action="logout" class="btn-primary" style="background:var(--red-50);color:var(--red-600)">${icon('logOut',20)} ログアウト</button>
+                 </div>
+              </div>` : ''}
+            `;
+        }
+
+        function renderAdminDashboard() {
+            const users = state.profiles.filter(p => p.role === 'user');
+            
+            let totalPending = 0;
+            const userHtml = users.length === 0 ? `<div class="p-12 text-center font-bold text-zinc-400">新人がいません</div>` : users.map(u => {
+                const c = state.userTasks.filter(ut => ut.userId === u.id && ut.isCompleted).length;
+                const prog = state.tasks.length ? Math.round((c / state.tasks.length)*100) : 0;
+                const pend = state.userTasks.filter(ut => ut.userId === u.id && !ut.isCompleted && ut.textAnswer && !ut.adminComment).length;
+                totalPending += pend;
+                const isInactive = (Date.now() - (u.lastActiveAt||u.createdAt)) > 259200000; // 3 days
+                
+                return `
+                <div class="p-6 border-b border-zinc-100 flex items-center justify-between cursor-pointer hover:bg-zinc-50 transition-colors" data-action="select-user" data-uid="${u.id}">
+                  <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-full bg-zinc-100 overflow-hidden flex items-center justify-center font-bold border border-zinc-200 shrink-0">
+                      ${u.avatarUrl ? `<img src="${u.avatarUrl}" class="w-full h-full object-cover"/>` : u.name[0]}
+                    </div>
+                    <div>
+                      <p class="font-black text-lg flex items-center flex-wrap gap-2">${escapeHTML(u.name)} ${isInactive?renderBadge('警告:未稼働','red'):''} ${pend>0?renderBadge('言語化あり','gray'):''}</p>
+                      <p class="text-xs text-zinc-400 font-bold mt-1">最終: ${new Date(u.lastActiveAt).toLocaleString()}</p>
                     </div>
                   </div>
+                  <div class="text-right shrink-0 ml-4">
+                    <p class="text-2xl font-black">${prog}%</p>
+                    <p class="text-xs font-bold text-zinc-400">稼働 ${u.workDays||0}日</p>
+                  </div>
+                </div>`;
+            }).join('');
+
+            return `
+            <div class="space-y-8 animate-in">
+              <div class="flex flex-col md-flex-row md-items-end justify-between gap-4">
+                 <div><h2 class="text-3xl md:text-4xl font-black tracking-tight">組織進捗</h2><p class="text-sm text-zinc-500 font-bold uppercase tracking-wider mt-1">Global Dashboard</p></div>
+                 ${totalPending>0 ? `<div class="bg-amber-50 text-amber-700 px-5 py-3 rounded-xl text-sm font-black border border-amber-200 flex items-center gap-2 shadow-sm">${icon('messageSquare',18)} 未承認の言語化が ${totalPending} 件</div>`:''}
+              </div>
+              <div class="grid grid-cols-1 md-grid-cols-2 gap-6">
+                <div class="bg-white p-8 rounded-3xl border border-zinc-200 shadow-sm flex justify-between items-center">
+                  <div><p class="text-xs text-zinc-400 font-black uppercase tracking-widest mb-2">Active Newbies</p><p class="text-5xl font-black">${users.length}<span class="text-lg text-zinc-400 ml-1">名</span></p></div>
+                  <div class="w-16 h-16 bg-zinc-100 rounded-2xl flex items-center justify-center text-zinc-900">${icon('users',32)}</div>
                 </div>
-              )}
+                <div class="bg-white p-8 rounded-3xl border border-zinc-200 shadow-sm flex justify-between items-center">
+                  <div><p class="text-xs text-zinc-400 font-black uppercase tracking-widest mb-2">Alerts (3d inactive)</p><p class="text-5xl font-black text-red-600">${users.filter(u=>(Date.now()-(u.lastActiveAt||u.createdAt))>259200000).length}<span class="text-lg ml-1">名</span></p></div>
+                  <div class="w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center text-red-600">${icon('alertCircle',32)}</div>
+                </div>
+              </div>
+              <div class="bg-white border border-zinc-200 rounded-3xl overflow-hidden shadow-sm">
+                 <div class="bg-zinc-50 px-6 py-4 border-b border-zinc-200 text-xs font-black text-zinc-500 uppercase tracking-widest flex justify-between"><span>新人一覧</span><span>進捗率</span></div>
+                 ${userHtml}
+              </div>
+            </div>`;
+        }
 
-              <div className="space-y-6 pt-10">
-                <h3 className="text-2xl font-black text-zinc-900 flex items-center gap-3 ml-2"><div className="w-2 h-8 bg-zinc-900 rounded-full"></div>ロードマップ全体図</h3>
-                {phases.map(p => (
-                  <div key={p.id} className="bg-white rounded-[2rem] border border-zinc-200 overflow-hidden shadow-sm">
-                    <div className="bg-zinc-50 px-8 py-5 border-b border-zinc-100 font-black text-[10px] text-zinc-500 uppercase tracking-widest">{p.name}</div>
-                    <div className="divide-y divide-zinc-100">
-                      {tasks.filter(t=>t.phaseId===p.id).map(t => {
-                        const ut = userTasks.find(x => x.taskId===t.id && x.userId===user.id);
-                        const isC = ut?.isCompleted;
-                        const isP = ut && !ut.isCompleted;
-                        return (
-                          <div key={t.id} className={`px-8 py-6 flex items-center justify-between transition-all group ${isC?'opacity-50 bg-white cursor-pointer hover:bg-zinc-50':isP?'bg-amber-50/30 cursor-pointer hover:bg-amber-50':'cursor-pointer hover:bg-zinc-50'}`} onClick={()=>onSelectTask(t)}>
-                             <div className="flex items-center gap-5 pr-4">
-                               {isC ? <CheckCircle size={28} className="text-zinc-900 shrink-0"/> : <div className="w-7 h-7 rounded-full border-2 border-zinc-300 shrink-0"/>}
-                               <div>
-                                 <div className="flex items-center gap-3 flex-wrap">
-                                   <p className={`font-bold text-base md:text-lg ${isC?'line-through text-zinc-500':'text-zinc-900'}`}>{t.title}</p>
-                                   {isC && MILESTONE_TASKS.includes(t.title) && <div className="mt-1"><Badge color="amber">🏆 稼働{ut.workDaysAtCompletion}日目で達成！</Badge></div>}
-                                 </div>
-                                 {isP && t.type === 'text' && <div className="mt-2"><Badge color="amber">管理者確認待ち...</Badge></div>}
-                               </div>
-                             </div>
-                             {!isC && <ChevronRight size={24} className={`${isP?'text-zinc-900':'text-zinc-300'} group-hover:text-zinc-900 shrink-0 transition-colors`}/>}
-                          </div>
-                        );
-                      })}
+        function renderUserDashboard() {
+            const u = state.currentUser;
+            const cCount = state.userTasks.filter(ut => ut.userId === u.id && ut.isCompleted).length;
+            const prog = state.tasks.length ? Math.round((cCount / state.tasks.length) * 100) : 0;
+            const today = getTodayStr();
+            
+            let nextTk = null, currPh = null;
+            for(const p of state.phases) {
+                const pTks = state.tasks.filter(t=>t.phaseId===p.id);
+                for(const t of pTks) {
+                    const ut = state.userTasks.find(x=>x.taskId===t.id && x.userId===u.id);
+                    if(!ut || !ut.isCompleted) { nextTk = t; currPh = p; break; }
+                }
+                if(nextTk) break;
+            }
+
+            let rank = "ルーキー"; let rIco = "users";
+            if(prog===100) { rank="フルスタック・クローザー"; rIco="award"; }
+            else if(currPh?.name.includes('4')) { rank="新人クローザー"; rIco="shieldCheck"; }
+            else if(currPh?.name.includes('3')) { rank="一人前アポインター"; rIco="checkCircle"; }
+            else if(currPh?.name.includes('2')) { rank="アポインター見習い"; rIco="play"; }
+
+            return `
+            <div class="space-y-8 animate-in max-w-3xl mx-auto pb-12">
+               <div class="bg-white p-8 md:p-10 rounded-3xl border border-zinc-200 shadow-sm relative overflow-hidden">
+                 <div class="absolute top-0 right-0 p-6 opacity-5 pointer-events-none">${icon('playCircle', 150)}</div>
+                 <p class="text-xs font-black text-zinc-400 uppercase tracking-widest mb-4">Origin Roadmap</p>
+                 <h2 class="text-4xl md:text-5xl font-black mb-6 tracking-tight">${escapeHTML(u.name)}</h2>
+                 <div class="inline-flex items-center gap-3 bg-zinc-50 px-4 py-2.5 rounded-full border border-zinc-200 mb-8 shadow-sm">
+                    <div class="w-8 h-8 rounded-full bg-white border border-zinc-200 flex items-center justify-center text-zinc-900">${icon(rIco, 16)}</div>
+                    <span class="text-sm font-black pr-2 text-zinc-800">${rank}</span>
+                 </div>
+                 
+                 <div class="grid md-grid-cols-2 gap-6">
+                    <div class="bg-zinc-900 p-8 rounded-3xl text-white shadow-lg">
+                      <p class="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-3">Total Progress</p>
+                      <p class="text-6xl font-black leading-none">${prog}<span class="text-xl ml-1">%</span></p>
+                      <div class="w-full bg-zinc-800 h-2 rounded-full mt-6 overflow-hidden"><div class="bg-white h-2 transition-all duration-1000" style="width:${prog}%"></div></div>
                     </div>
+                    <div class="bg-zinc-50 p-8 rounded-3xl border border-zinc-200 flex flex-col justify-between">
+                      <div><p class="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-3">Work Days</p><p class="text-5xl font-black">${u.workDays||0} <span class="text-sm font-bold text-zinc-400">Days</span></p></div>
+                      <div class="mt-6 pt-6 border-t border-zinc-200">
+                         ${u.lastWorkDate === today ? `<div class="bg-emerald-50 text-emerald-700 px-4 py-3.5 rounded-xl text-sm font-black border border-emerald-200 flex items-center justify-center gap-2 shadow-sm">${icon('checkCircle',18)} 本日稼働中</div>` : `<button data-action="start-work" class="btn-primary text-sm py-4">本日の稼働を記録する</button>`}
+                      </div>
+                    </div>
+                 </div>
+               </div>
+
+               ${nextTk ? `
+               <div class="bg-zinc-900 p-8 md:p-10 rounded-3xl shadow-xl cursor-pointer transform transition hover:-translate-y-1 relative overflow-hidden group" data-action="select-task" data-tid="${nextTk.id}">
+                  <div class="absolute inset-0 bg-white opacity-0 group-hover:opacity-5 transition-opacity"></div>
+                  <span class="bg-white text-zinc-900 text-xs font-black px-4 py-2 rounded-full inline-flex items-center gap-1.5 mb-6 uppercase tracking-widest shadow-sm">${icon('playCircle',14)} Next Action</span>
+                  <h3 class="text-3xl font-black text-white mb-8 leading-tight">${escapeHTML(nextTk.title)}</h3>
+                  <div class="flex items-center justify-between border-t border-zinc-800 pt-6">
+                     <span class="text-sm font-bold text-zinc-400 bg-zinc-800 px-4 py-2 rounded-xl flex items-center gap-2 border border-zinc-700">
+                       ${icon(nextTk.type==='video'?'video':nextTk.type==='text'?'edit':nextTk.type==='link'?'externalLink':'checkSquare', 16)} 
+                       ${nextTk.type==='video'?'動画視聴':nextTk.type==='test'?'理解度テスト':nextTk.type==='text'?'言語化提出':nextTk.type==='link'?'リンク確認':'アクション実行'}
+                     </span>
+                     <span class="text-white font-black flex items-center gap-1 group-hover:translate-x-1 transition-transform">開く ${icon('chevronRight',20)}</span>
                   </div>
-                ))}
-              </div>
-            </div>
-          );
-        };
+               </div>` : `
+               <div class="bg-white border border-zinc-200 p-12 rounded-3xl text-center shadow-sm">
+                  <div class="w-20 h-20 bg-zinc-50 border border-zinc-100 rounded-full flex items-center justify-center mx-auto mb-6">${icon('award',40,'text-zinc-900')}</div>
+                  <h3 class="text-3xl font-black mb-2">全カリキュラム修了！</h3><p class="text-zinc-500 font-bold">素晴らしいです！今後のさらなる活躍を期待しています。</p>
+               </div>`}
 
-        const UserDetailView = ({ user, phases, tasks, userTasks, onBack, updateUserTask }) => {
-          const [cmt, setCmt] = useState({});
-          const approve = (utId, taskId) => {
-             updateUserTask(utId, { adminComment: cmt[taskId] || '確認しました。', isCompleted: true });
-             setCmt({...cmt, [taskId]: ''});
-          };
-
-          return (
-            <div className="space-y-10 animate-in pb-20">
-              <button onClick={onBack} className="text-zinc-500 text-sm font-black flex items-center gap-2 hover:text-zinc-900 transition-colors"><ChevronRight className="rotate-180" size={20}/> 戻る</button>
-              <div className="bg-white p-10 rounded-[2.5rem] border border-zinc-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-8">
-                 <div className="flex items-center gap-6"><div className="w-20 h-20 rounded-full bg-zinc-100 overflow-hidden">{user.avatarUrl && <img src={user.avatarUrl} className="w-full h-full object-cover"/>}</div><div><h2 className="text-4xl font-black">{user.name}</h2><p className="text-zinc-400 font-bold text-xs mt-1">累計稼働: {user.workDays||0}日</p></div></div>
-              </div>
-
-              <div className="space-y-8">
-                {phases.map(p => (
-                  <div key={p.id} className="bg-white rounded-[2rem] border border-zinc-200 overflow-hidden shadow-sm">
-                    <div className="bg-zinc-50 px-8 py-5 border-b border-zinc-100 font-black text-[10px] text-zinc-500 uppercase tracking-widest">{p.name}</div>
-                    <div className="divide-y divide-zinc-100">
-                      {tasks.filter(t=>t.phaseId===p.id).map(t => {
-                        const ut = userTasks.find(x => x.taskId===t.id && x.userId===user.id);
-                        const isC = ut?.isCompleted;
-                        return (
-                          <div key={t.id} className={`p-8 transition-colors ${!isC && ut?.textAnswer ? 'bg-amber-50/40' : ''}`}>
-                             <div className="flex items-center gap-5">
-                               {isC ? <CheckCircle size={28} className="text-zinc-900 shrink-0"/> : <div className="w-6 h-6 rounded-full border-2 border-zinc-300 shrink-0"/>}
-                               <div><p className={`font-bold text-lg md:text-xl ${isC?'text-zinc-900':'text-zinc-500'}`}>{t.title}</p></div>
-                             </div>
-                             {ut?.textAnswer && !isC && (
-                               <div className="ml-12 mt-6 p-6 bg-white rounded-3xl border border-zinc-200 shadow-sm space-y-4">
-                                  <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">提出内容</p>
-                                  <p className="text-zinc-900 text-lg font-bold whitespace-pre-wrap leading-relaxed">{ut.textAnswer}</p>
-                                  <div className="pt-6 border-t border-zinc-100 flex flex-col md:flex-row gap-3">
-                                    <input type="text" placeholder="フィードバックを入力..." value={cmt[t.id]||''} onChange={e=>setCmt({...cmt, [t.id]: e.target.value})} className="flex-1 text-base bg-zinc-50 border border-zinc-200 rounded-2xl px-5 py-3 outline-none focus:ring-2 focus:ring-zinc-900 font-bold"/>
-                                    <button onClick={()=>approve(ut.id, t.id)} className="bg-zinc-900 text-white px-8 py-3.5 rounded-2xl text-sm font-black shadow-lg active:scale-95 transition-all">承認して進める</button>
+               <div class="space-y-6 pt-6">
+                 <h3 class="text-2xl font-black flex items-center gap-3"><div class="w-2 h-8 bg-zinc-900 rounded-full"></div>ロードマップ全体図</h3>
+                 ${state.phases.map(p => {
+                    const tks = state.tasks.filter(t=>t.phaseId===p.id);
+                    if(!tks.length) return '';
+                    return `
+                    <div class="bg-white border border-zinc-200 rounded-3xl overflow-hidden shadow-sm">
+                       <div class="bg-zinc-50 px-8 py-5 border-b border-zinc-100 text-xs font-black text-zinc-500 uppercase tracking-widest">${escapeHTML(p.name)}</div>
+                       <div class="divide-y divide-zinc-100">
+                         ${tks.map(t => {
+                            const ut = state.userTasks.find(x=>x.taskId===t.id && x.userId===u.id);
+                            const isC = ut?.isCompleted; const isP = ut && !isC;
+                            return `
+                            <div class="p-6 md:px-8 flex items-center justify-between cursor-pointer transition ${isC?'opacity-50 hover:bg-zinc-50':isP?'bg-amber-50/50 hover:bg-amber-50':'hover:bg-zinc-50'}" data-action="select-task" data-tid="${t.id}">
+                               <div class="flex items-center gap-5 pr-4">
+                                  ${isC?icon('checkCircle',28,'text-zinc-900 shrink-0'):`<div class="w-7 h-7 rounded-full border-2 border-zinc-300 shrink-0"></div>`}
+                                  <div>
+                                     <div class="flex flex-wrap items-center gap-3">
+                                        <p class="font-bold text-lg ${isC?'line-through text-zinc-500':'text-zinc-900'}">${escapeHTML(t.title)}</p>
+                                        ${isC && MILESTONE_TASKS.includes(t.title) && ut?.workDaysAtCompletion!==undefined ? `<div class="mt-1">${renderBadge(`🏆 稼働${ut.workDaysAtCompletion}日目で達成`,'amber')}</div>`:''}
+                                     </div>
+                                     ${isP && t.type==='text' ? `<div class="mt-2">${renderBadge('管理者確認待ち...','amber')}</div>` : ''}
                                   </div>
                                </div>
-                             )}
-                          </div>
-                        );
-                      })}
+                               ${!isC ? icon('chevronRight',24, isP?'text-zinc-900':'text-zinc-300') : ''}
+                            </div>`;
+                         }).join('')}
+                       </div>
+                    </div>`;
+                 }).join('')}
+               </div>
+            </div>`;
+        }
+
+        function renderUserDetail() {
+            const u = state.activeTargetUser;
+            const cCount = state.userTasks.filter(ut => ut.userId === u.id && ut.isCompleted).length;
+            const prog = state.tasks.length ? Math.round((cCount / state.tasks.length) * 100) : 0;
+            
+            return `
+            <div class="space-y-8 animate-in pb-12 max-w-4xl mx-auto">
+              <button data-action="nav" data-view="dashboard" class="text-zinc-500 font-bold flex items-center gap-1 hover:text-zinc-900 transition-colors">${icon('chevronRight',18,'rotate-180')} 戻る</button>
+              
+              <div class="bg-white p-8 rounded-[2.5rem] border border-zinc-200 shadow-sm flex flex-col md-flex-row md-items-center justify-between gap-6">
+                 <div class="flex items-center gap-5">
+                    <div class="w-20 h-20 rounded-full bg-zinc-100 border border-zinc-200 flex items-center justify-center font-black text-3xl overflow-hidden shrink-0 shadow-inner">
+                      ${u.avatarUrl ? `<img src="${u.avatarUrl}" class="w-full h-full object-cover"/>` : u.name[0]}
                     </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          );
-        };
-
-        const PhaseManagement = ({ phases, tasks, onSeed, onResetSeed, adminSecretKey, updateSettings, addPhase, deletePhase, addTask, updateTask, deleteTask }) => {
-          const [newP, setNewP] = useState('');
-          const [editT, setEditT] = useState(null);
-          
-          const [newSecret, setNewSecret] = useState(adminSecretKey);
-          
-          // ★ カスタムモーダルの状態管理を追加
-          const [confirmDialog, setConfirmDialog] = useState(null); // { message: string, onConfirm: function }
-          const [alertDialog, setAlertDialog] = useState(null);     // string
-
-          useEffect(() => { setNewSecret(adminSecretKey); }, [adminSecretKey]);
-
-          const handleUpdateSecret = () => {
-            updateSettings({ adminSecretKey: newSecret });
-            setAlertDialog('✅ 管理者シークレットキーを更新しました！\n次回からの管理者登録にはこの新しいキーが必要になります。');
-          };
-
-          return (
-            <div className="space-y-10 animate-in pb-20 relative">
-              {/* カスタム Alert モーダル */}
-              {alertDialog && (
-                <div className="fixed inset-0 bg-zinc-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-6 animate-in">
-                   <div className="bg-white w-full max-w-sm rounded-[2rem] p-8 shadow-2xl text-center">
-                      <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4"><CheckCircle size={32}/></div>
-                      <p className="text-zinc-900 font-bold whitespace-pre-wrap mb-6 leading-relaxed">{alertDialog}</p>
-                      <button onClick={() => setAlertDialog(null)} className="w-full py-4 bg-zinc-900 text-white font-bold rounded-2xl active:scale-95 transition-transform">OK</button>
-                   </div>
-                </div>
-              )}
-
-              {/* カスタム Confirm モーダル */}
-              {confirmDialog && (
-                <div className="fixed inset-0 bg-zinc-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-6 animate-in">
-                   <div className="bg-white w-full max-w-sm rounded-[2rem] p-8 shadow-2xl text-center">
-                      <div className="w-16 h-16 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-4"><AlertCircle size={32}/></div>
-                      <p className="text-zinc-900 font-bold whitespace-pre-wrap mb-6 leading-relaxed">{confirmDialog.message}</p>
-                      <div className="flex gap-3">
-                         <button onClick={confirmDialog.onConfirm} className="flex-1 py-4 bg-red-600 text-white font-bold rounded-2xl shadow-lg active:scale-95 transition-transform">はい</button>
-                         <button onClick={() => setConfirmDialog(null)} className="flex-1 py-4 bg-zinc-100 text-zinc-700 font-bold rounded-2xl hover:bg-zinc-200 transition-colors">キャンセル</button>
-                      </div>
-                   </div>
-                </div>
-              )}
-
-              <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-zinc-200 pb-8">
-                 <div><h2 className="text-4xl font-black">管理設定</h2></div>
-                 {phases.length === 0 ? (
-                   <button onClick={onSeed} className="bg-zinc-900 text-white px-6 py-4 rounded-2xl text-sm font-black shadow-xl active:scale-95 transition-transform">初期データ(39タスク)を生成</button>
-                 ) : (
-                   <button onClick={() => setConfirmDialog({
-                       message: "現在のタスクを全て削除し、本来の全39タスクに初期化しますか？\n※ユーザーの進捗は保持されます。",
-                       onConfirm: () => { onResetSeed(); setConfirmDialog(null); }
-                   })} className="bg-red-50 text-red-600 border border-red-200 px-6 py-3 rounded-2xl text-xs font-black shadow-sm active:scale-95 transition-transform">全タスクを初期化して再生成</button>
-                 )}
-              </div>
-
-              <div className="bg-white border border-zinc-200 rounded-[2.5rem] p-8 shadow-sm">
-                <h3 className="text-2xl font-black mb-3 flex items-center gap-3"><ShieldCheck size={28}/> セキュリティ設定</h3>
-                <p className="text-zinc-500 text-base font-bold mb-6">新しい管理者を登録する際に必要な「シークレットキー」を変更できます。</p>
-                <div className="flex flex-col md:flex-row gap-4 items-center">
-                  <input type="text" placeholder="新しいシークレットキー" value={newSecret} onChange={e=>setNewSecret(e.target.value)} className="flex-1 w-full p-5 bg-zinc-50 border border-zinc-200 rounded-2xl outline-none font-bold text-lg"/>
-                  <button onClick={handleUpdateSecret} disabled={newSecret === adminSecretKey} className="w-full md:w-auto bg-zinc-900 text-white px-10 py-5 rounded-2xl font-black text-sm disabled:opacity-50">更新する</button>
-                </div>
-              </div>
-
-              <div className="space-y-8 pt-6">
-                 <h3 className="text-2xl font-black flex items-center gap-3 ml-2"><div className="w-2 h-8 bg-zinc-900 rounded-full"></div>ロードマップ編集</h3>
-                 {phases.map(p => (
-                   <div key={p.id} className="bg-white rounded-[2rem] border border-zinc-200 overflow-hidden shadow-sm">
-                      <div className="bg-zinc-50 px-8 py-5 border-b border-zinc-100 flex justify-between items-center text-lg">
-                        <span className="font-black text-zinc-800">{p.name}</span>
-                        <button onClick={() => setConfirmDialog({
-                            message: `フェーズ「${p.name}」と、その中のすべてのタスクを削除しますか？`,
-                            onConfirm: () => { deletePhase(p.id); setConfirmDialog(null); }
-                        })} className="text-zinc-400 hover:text-red-500"><X size={20}/></button>
-                      </div>
-                      <div className="p-6 space-y-4">
-                        {tasks.filter(t=>t.phaseId===p.id).map((t, idx) => (
-                          <div key={t.id} className="flex items-center justify-between p-5 bg-white border border-zinc-100 rounded-2xl group hover:border-zinc-300">
-                            <div className="flex items-center gap-4">
-                              <span className="text-zinc-300 font-black text-lg">{idx+1}.</span>
-                              <div><p className="font-bold text-lg text-zinc-900">{t.title}</p><p className="text-xs text-zinc-400 font-mono mt-1">{t.type}</p></div>
-                            </div>
-                            <div className="flex gap-2">
-                              <button onClick={()=>setEditT(t)} className="p-2.5 text-zinc-400 bg-white hover:text-zinc-900 rounded-xl shadow-sm border border-zinc-100"><Edit3 size={18}/></button>
-                              <button onClick={() => setConfirmDialog({
-                                  message: `タスク「${t.title}」を削除しますか？`,
-                                  onConfirm: () => { deleteTask(t.id); setConfirmDialog(null); }
-                              })} className="p-2.5 text-zinc-400 bg-white hover:text-red-600 rounded-xl shadow-sm border border-zinc-100"><X size={18}/></button>
-                            </div>
-                          </div>
-                        ))}
-                        <button onClick={()=>addTask(p.id, '新しいタスク', 'normal', '')} className="w-full py-5 border-2 border-dashed border-zinc-200 rounded-2xl text-sm font-black text-zinc-400 hover:bg-zinc-50">+ タスクを追加</button>
-                      </div>
-                   </div>
-                 ))}
-                 <div className="bg-white border-2 border-dashed border-zinc-200 p-8 rounded-[2.5rem] flex gap-4">
-                    <input type="text" placeholder="新しいフェーズの名前" value={newP} onChange={e=>setNewP(e.target.value)} className="flex-1 bg-zinc-50 p-5 rounded-2xl outline-none font-bold text-lg border border-zinc-200"/>
-                    <button onClick={()=>{ if(newP){ addPhase(newP); setNewP(''); } }} className="bg-zinc-900 text-white px-10 rounded-2xl font-black text-sm">追加</button>
+                    <div>
+                      <h2 class="text-4xl font-black tracking-tight mb-1">${escapeHTML(u.name)}</h2>
+                      <p class="text-zinc-500 text-xs font-bold uppercase tracking-wider">最終ログイン: ${new Date(u.lastActiveAt).toLocaleString()}</p>
+                    </div>
+                 </div>
+                 <div class="bg-zinc-50 px-8 py-5 rounded-3xl border border-zinc-200 text-right min-w-[180px]">
+                    <p class="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Progress</p>
+                    <p class="text-5xl font-black text-zinc-900 tracking-tighter">${prog}%</p>
+                    <div class="border-t border-zinc-200 pt-3 mt-3 flex justify-between items-center"><span class="text-xs font-bold text-zinc-500">稼働日数</span><span class="font-black text-lg">${u.workDays||0}日</span></div>
                  </div>
               </div>
-              
-              {editT && (
-                <div className="fixed inset-0 bg-zinc-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-6 animate-in">
-                   <div className="bg-white w-full max-w-lg rounded-[2.5rem] p-10 shadow-2xl">
-                      <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-3">タスクの編集</p>
-                      <div className="space-y-5">
-                        <input type="text" value={editT.title} onChange={e=>setEditT({...editT, title:e.target.value})} className="w-full p-4 bg-white border-2 border-zinc-200 rounded-2xl outline-none font-bold text-lg"/>
-                        <select value={editT.type} onChange={e=>setEditT({...editT, type:e.target.value})} className="w-full p-4 bg-white border-2 border-zinc-200 rounded-2xl outline-none font-bold">
-                           <option value="normal">通常タスク</option><option value="video">動画視聴 (100%再生必須)</option><option value="test">理解度テスト (自動採点)</option><option value="text">言語化提出 (管理者承認)</option><option value="link">リンクタスク</option>
-                        </select>
-                        {(editT.type==='video'||editT.type==='link'||editT.type==='test') && <textarea value={editT.content||''} onChange={e=>setEditT({...editT, content:e.target.value})} placeholder="URLやJSONデータを入力..." className="w-full p-4 bg-white border-2 border-zinc-200 rounded-2xl outline-none font-bold h-32 font-mono text-sm"/>}
-                        <div className="flex gap-4 pt-4">
-                           <button onClick={()=>{ updateTask(editT.id, editT); setEditT(null); }} className="flex-1 py-4 bg-zinc-900 text-white font-black rounded-2xl">保存する</button>
-                           <button onClick={()=>setEditT(null)} className="flex-1 py-4 bg-white border-2 border-zinc-200 text-zinc-700 font-black rounded-2xl">キャンセル</button>
-                        </div>
-                      </div>
-                   </div>
+
+              <div class="space-y-6 pt-4">
+                ${state.phases.map(p => {
+                  const tks = state.tasks.filter(t=>t.phaseId===p.id);
+                  if(!tks.length) return '';
+                  return `
+                  <div class="bg-white border border-zinc-200 rounded-3xl overflow-hidden shadow-sm">
+                    <div class="bg-zinc-50 px-8 py-5 border-b border-zinc-100 font-black text-sm uppercase tracking-widest text-zinc-500">${escapeHTML(p.name)}</div>
+                    <div class="divide-y divide-zinc-100">
+                      ${tks.map(t => {
+                        const ut = state.userTasks.find(x => x.taskId===t.id && x.userId===u.id);
+                        const isC = ut?.isCompleted;
+                        return `
+                        <div class="p-6 md:p-8 transition-colors ${!isC && ut?.textAnswer ? 'bg-amber-50/50' : ''}">
+                           <div class="flex items-center gap-4 mb-2">
+                             ${isC ? icon('checkCircle',24,'text-zinc-900 shrink-0') : '<div class="w-6 h-6 rounded-full border-2 border-zinc-300 shrink-0"></div>'}
+                             <p class="font-bold text-xl ${isC?'text-zinc-900':'text-zinc-600'}">${escapeHTML(t.title)}</p>
+                           </div>
+                           ${ut ? `
+                             <div class="ml-10 mt-4 space-y-4">
+                               ${t.type==='video' && ut.completionRate!==undefined ? `<p class="font-bold text-sm text-zinc-600 bg-zinc-50 inline-block px-3 py-1.5 rounded-lg border border-zinc-200">視聴率: <span class="font-black text-zinc-900">${Math.round(ut.completionRate)}%</span></p>`:''}
+                               ${t.type==='test' && ut.score!==undefined ? `<p class="font-bold text-sm text-zinc-600 bg-zinc-50 inline-block px-3 py-1.5 rounded-lg border border-zinc-200">スコア: <span class="font-black ${ut.score>=100?'text-emerald-600':'text-red-600'}">${ut.score}点</span></p>`:''}
+                               ${t.type==='text' && ut.textAnswer ? `
+                                 <div class="bg-white p-6 rounded-2xl border ${isC?'border-zinc-200':'border-amber-200'} shadow-sm">
+                                    <p class="text-xs font-black text-zinc-400 uppercase tracking-widest mb-3">提出内容</p>
+                                    <p class="font-bold text-lg leading-relaxed whitespace-pre-wrap text-zinc-900">${escapeHTML(ut.textAnswer)}</p>
+                                    <div class="mt-5 pt-5 border-t border-zinc-100">
+                                      ${ut.adminComment ? `
+                                        <p class="text-xs font-black text-zinc-400 uppercase tracking-widest mb-2 flex items-center gap-1">${icon('messageSquare',14)} フィードバック済</p>
+                                        <p class="font-bold whitespace-pre-wrap text-zinc-700 bg-zinc-50 p-4 rounded-xl">${escapeHTML(ut.adminComment)}</p>
+                                      ` : `
+                                        <div class="flex flex-col gap-3">
+                                          <p class="text-xs font-black text-amber-600 flex items-center gap-1 uppercase tracking-widest">${icon('alertCircle',14)} 確認して完了にする</p>
+                                          <div class="flex flex-col md-flex-row gap-3">
+                                            <input type="text" id="feedback_${ut.id}" placeholder="フィードバックを入力(空欄可)..." class="flex-1 font-bold bg-zinc-50" />
+                                            <button data-action="approve-task" data-utid="${ut.id}" data-tid="${t.id}" class="bg-zinc-900 text-white px-6 py-3 rounded-xl font-black text-sm shrink-0 shadow-md hover:bg-zinc-800 active:scale-95 transition-all">承認する</button>
+                                          </div>
+                                        </div>
+                                      `}
+                                    </div>
+                                 </div>
+                               `:''}
+                             </div>
+                           ` : ''}
+                        </div>`;
+                      }).join('')}
+                    </div>
+                  </div>`;
+                }).join('')}
+              </div>
+            </div>`;
+        }
+
+        function renderPhaseManagement() {
+            return `
+            <div class="space-y-10 animate-in pb-12 max-w-4xl mx-auto">
+              <div class="flex flex-col md-flex-row md-items-end justify-between gap-6 border-b border-zinc-200 pb-6">
+                 <div><h2 class="text-4xl font-black tracking-tight">管理設定</h2></div>
+                 ${state.phases.length === 0 ? 
+                   `<button data-action="seed-data" class="bg-zinc-900 text-white px-6 py-4 rounded-2xl font-black shadow-lg active:scale-95 transition-transform text-sm">初期データ(39タスク)を生成</button>` : 
+                   `<button data-action="reset-seed-data" class="bg-red-50 text-red-600 border border-red-200 px-6 py-3.5 rounded-2xl text-sm font-black shadow-sm active:scale-95 transition-transform">全タスクを初期化して再生成</button>`
+                 }
+              </div>
+
+              <div class="bg-white border border-zinc-200 rounded-[2.5rem] p-8 shadow-sm">
+                <h3 class="text-2xl font-black mb-3 flex items-center gap-2">${icon('shieldCheck',28)} セキュリティ設定</h3>
+                <p class="text-zinc-500 font-bold mb-6">新しい管理者を登録する際に必要な「シークレットキー」を変更できます。</p>
+                <div class="flex flex-col md-flex-row gap-4 items-center">
+                  <input type="text" id="newSecretKeyInput" placeholder="新しいシークレットキー" value="${escapeHTML(state.newSecretKey)}" class="flex-1 font-bold text-lg bg-zinc-50 p-4 rounded-2xl border border-zinc-200"/>
+                  <button data-action="update-secret" class="w-full md-w-auto bg-zinc-900 text-white px-10 py-4 rounded-2xl font-black shadow-md active:scale-95 transition-all">更新する</button>
                 </div>
-              )}
-            </div>
-          );
-        };
-
-        const TaskExecutor = ({ task, user, userTasks, onBack, addUserTask, updateUserTask }) => {
-          const [loading, setLoading] = useState(false);
-          const [ans, setAns] = useState('');
-          const ut = userTasks.find(x => x.taskId===task.id && x.userId===user.id);
-          const isC = ut?.isCompleted;
-
-          const complete = (extra = {}) => {
-            if (isC && task.type !== 'video' && task.type !== 'test') return onBack();
-            setLoading(true);
-            const data = { userId: user.id, taskId: task.id, isCompleted: task.type !== 'text', completedAt: Date.now(), workDaysAtCompletion: Number(user.workDays || 0), ...extra };
-            
-            if (ut) { updateUserTask(ut.id, data); } 
-            else { addUserTask(data); }
-            
-            setLoading(false); onBack();
-          };
-
-          return (
-            <div className="max-w-3xl mx-auto space-y-8 animate-in pb-20">
-              <button onClick={onBack} className="text-sm font-black text-zinc-400 hover:text-zinc-900 flex items-center gap-2 transition"><ChevronRight className="rotate-180" size={20}/> 戻る</button>
-              <div className="bg-white p-10 md:p-14 rounded-[3rem] border border-zinc-200 shadow-sm space-y-8">
-                <Badge color="amber">{task.type}</Badge>
-                <h2 className="text-4xl font-black tracking-tighter leading-tight">{task.title}</h2>
-                {task.type === 'normal' && <div className="py-12 text-center"><div className="text-zinc-600 bg-zinc-50 border border-zinc-100 p-8 rounded-3xl font-bold text-lg mb-8">内容を確認・実行し、完了したらボタンを押してください。</div><button disabled={loading} onClick={()=>complete()} className="w-full py-6 bg-zinc-900 hover:bg-zinc-800 text-white font-black rounded-[2rem] shadow-xl active:scale-95 transition-all text-xl">{isC?'完了済み':'アクションを完了にする'}</button></div>}
-                {task.type === 'link' && <div className="space-y-8 text-center py-8"><a href={task.content} target="_blank" className="w-full py-6 bg-white border-2 border-zinc-900 text-zinc-900 font-black rounded-[2rem] flex items-center justify-center gap-3 hover:bg-zinc-50 transition-colors text-xl"><ExternalLink size={28}/> リンクを開く</a><button onClick={()=>complete()} className="w-full py-6 bg-zinc-900 text-white font-black rounded-[2rem] shadow-xl text-xl">完了にする</button></div>}
-                {task.type === 'video' && <div className="space-y-8"><VideoPlayer url={task.content} isCompleted={isC} onComplete={()=>complete({completionRate:100})} /></div>}
-                {task.type === 'text' && (
-                  <div className="space-y-8">
-                     {isC || (ut && !ut.isCompleted) ? (
-                        <div className="p-8 bg-zinc-50 rounded-3xl border border-zinc-100 shadow-inner"><p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-4">提出内容</p><p className="text-zinc-900 font-bold whitespace-pre-wrap text-lg leading-relaxed">{ut.textAnswer}</p></div>
-                     ) : (
-                        <><p className="text-base text-zinc-600 font-bold bg-zinc-50 p-6 rounded-2xl border border-zinc-100 leading-relaxed shadow-sm">稼働してみて思ったこと、良かったこと、悪かったこと、わからなかったことを具体的に言語化してください。</p><textarea rows={6} value={ans} onChange={e=>setAns(e.target.value)} placeholder="ここに入力..." className="w-full p-6 bg-white border-2 border-zinc-200 rounded-3xl outline-none font-bold text-lg focus:ring-4 focus:ring-zinc-900 focus:border-zinc-900 transition-all shadow-sm"/><button disabled={loading||!ans} onClick={()=>complete({textAnswer: ans})} className="w-full py-6 bg-zinc-900 text-white font-black rounded-[2rem] shadow-xl active:scale-95 transition-transform text-xl">上層部に提出する</button></>
-                     )}
-                  </div>
-                )}
-                {task.type === 'test' && <TestRunner content={task.content} ut={ut} onComplete={(score, passed)=>complete({score, isCompleted: passed})} />}
               </div>
-            </div>
-          );
-        };
 
-        const VideoPlayer = ({ url, isCompleted, onComplete }) => {
-          const videoRef = useRef(null);
-          const [maxTime, setMaxTime] = useState(0);
-
-          const handleTimeUpdate = () => {
-            if (isCompleted) return;
-            const video = videoRef.current;
-            if (!video) return;
-            if (video.currentTime > maxTime + 1.5) video.currentTime = maxTime;
-            else setMaxTime(Math.max(maxTime, video.currentTime));
-          };
-
-          return (
-            <div className="space-y-8">
-              <div className="bg-black rounded-3xl overflow-hidden relative shadow-2xl border-4 border-zinc-100"><video ref={videoRef} src={url} controls controlsList="nodownload nofullscreen noremoteplayback" onTimeUpdate={handleTimeUpdate} onEnded={onComplete} className="w-full aspect-video object-contain" playsInline/></div>
-              <div className={`p-6 rounded-3xl text-sm md:text-base flex items-start gap-4 border-2 ${isCompleted ? 'bg-zinc-50 border-zinc-200 text-zinc-600' : 'bg-zinc-900 border-zinc-800 text-zinc-300'}`}>
-                {isCompleted ? <><CheckCircle size={28} className="mt-1 shrink-0 text-zinc-900"/><p className="font-bold leading-relaxed">この動画は視聴完了済みです。<br/><span className="font-medium text-zinc-500 mt-1 block">自由に早送り・巻き戻しして復習できます。</span></p></> : <><AlertCircle size={28} className="mt-1 shrink-0 text-white"/><p className="font-bold leading-relaxed text-white">早送りは無効化されています。<br/><span className="text-zinc-400 font-medium mt-1 block">最後まで（100%）視聴すると自動的に完了になります。</span></p></>}
-              </div>
-            </div>
-          );
-        };
-
-        const TestRunner = ({ content, ut, onComplete }) => {
-          const [data] = useState(() => {
-             try { return JSON.parse(content || '{"questions":[],"passScore":100}'); }
-             catch(e) { return { questions: [], passScore: 100 }; }
-          });
-          const [sel, setSel] = useState({});
-          const [res, setRes] = useState(null);
-
-          const check = () => { let c = 0; data.questions.forEach((q, i) => { if(sel[i] === q.answer) c++; }); const score = Math.round((c / data.questions.length) * 100); setRes({ score, passed: score >= data.passScore }); };
-
-          if(res) return <div className="text-center py-12 space-y-8 animate-in"><div className={`w-32 h-32 mx-auto rounded-full flex items-center justify-center text-5xl font-black shadow-xl border-4 ${res.passed?'bg-white border-emerald-500 text-emerald-600 shadow-emerald-100':'bg-red-50 border-red-200 text-red-600 shadow-red-100'}`}>{res.score}</div><div><h3 className="text-4xl font-black tracking-tighter mb-3">{res.passed?'合格！':'不合格...'}</h3><p className="text-zinc-500 font-bold text-lg">{res.passed ? 'おめでとうございます！次へ進みましょう。' : '復習して再挑戦してください。'}</p></div><button onClick={()=>onComplete(res.score, res.passed)} className="w-full py-6 bg-zinc-900 text-white font-black rounded-[2rem] shadow-xl text-xl">結果を保存して戻る</button></div>;
-
-          return (
-            <div className="space-y-10 animate-in">
-               <div className="flex justify-between items-center bg-zinc-50 p-6 rounded-3xl border border-zinc-200 shadow-sm"><span className="text-sm font-black tracking-widest uppercase">合格ライン: {data.passScore}点</span>{ut?.isCompleted && <span className="text-xs font-bold bg-white px-4 py-2 rounded-xl shadow-sm text-zinc-500 border border-zinc-200">過去に合格済み (最高: {ut.score}点)</span>}</div>
-               <div className="space-y-8">
-                 {data.questions.map((q, i) => (
-                   <div key={i} className="space-y-6 bg-white p-8 rounded-[2rem] border border-zinc-200 shadow-sm">
-                      <p className="font-black text-xl leading-relaxed"><span className="text-zinc-400 mr-3 text-2xl">Q{i+1}.</span>{q.q}</p>
-                      <div className="space-y-3 mt-6">
-                        {q.options.map((o, oi) => (
-                          <label key={oi} onClick={()=>setSel({...sel, [i]: oi})} className={`flex items-center gap-4 p-5 border-2 rounded-2xl cursor-pointer transition-all ${sel[i]===oi?'border-zinc-900 bg-zinc-900 text-white shadow-lg':'border-zinc-100 bg-white hover:border-zinc-300'}`}>
-                            <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors ${sel[i]===oi?'border-white':'border-zinc-300'}`}>
-                               {sel[i]===oi && <div className="w-3 h-3 bg-white rounded-full"></div>}
+              <div class="space-y-8 pt-6">
+                 <h3 class="text-2xl font-black flex items-center gap-3"><div class="w-2 h-8 bg-zinc-900 rounded-full"></div>ロードマップ編集</h3>
+                 ${state.phases.map(p => `
+                   <div class="bg-white rounded-[2rem] border border-zinc-200 overflow-hidden shadow-sm">
+                      <div class="bg-zinc-50 px-8 py-5 border-b border-zinc-100 flex justify-between items-center">
+                        <span class="font-black text-xl text-zinc-900">${escapeHTML(p.name)}</span>
+                        <button data-action="delete-phase" data-pid="${p.id}" class="text-zinc-400 hover:text-red-600 transition-colors">${icon('x',24)}</button>
+                      </div>
+                      <div class="p-6 space-y-4">
+                        ${state.tasks.filter(t=>t.phaseId===p.id).map((t, idx) => `
+                          ${state.editingTask?.id === t.id ? `
+                             <div class="border-2 border-zinc-900 bg-zinc-50 p-6 rounded-2xl space-y-5 shadow-md my-4 animate-in">
+                                <p class="text-xs font-black text-zinc-500 uppercase tracking-widest">タスクの編集</p>
+                                <input type="text" data-model="editTitle" value="${escapeHTML(state.editTaskData.title)}" class="font-bold text-lg bg-white border border-zinc-200 p-4 rounded-xl" />
+                                <select data-model="editType" class="font-bold text-base bg-white border border-zinc-200 p-4 rounded-xl">
+                                  <option value="normal" ${state.editTaskData.type==='normal'?'selected':''}>通常タスク</option>
+                                  <option value="video" ${state.editTaskData.type==='video'?'selected':''}>動画視聴 (100%再生必須)</option>
+                                  <option value="test" ${state.editTaskData.type==='test'?'selected':''}>理解度テスト (自動採点)</option>
+                                  <option value="text" ${state.editTaskData.type==='text'?'selected':''}>言語化提出 (管理者承認)</option>
+                                  <option value="link" ${state.editTaskData.type==='link'?'selected':''}>リンクタスク</option>
+                                </select>
+                                ${['video','test','link'].includes(state.editTaskData.type) ? `
+                                  <textarea data-model="editContent" placeholder="URLやJSONデータを入力..." class="font-mono text-sm h-32 bg-white border border-zinc-200 p-4 rounded-xl leading-relaxed">${escapeHTML(state.editTaskData.content)}</textarea>
+                                ` : ''}
+                                <div class="flex gap-3 pt-2">
+                                  <button data-action="save-edit" class="flex-1 bg-zinc-900 text-white py-4 rounded-xl font-black text-sm shadow-md active:scale-95 transition-all">保存する</button>
+                                  <button data-action="cancel-edit" class="flex-1 bg-white border border-zinc-200 font-black text-sm text-zinc-700 rounded-xl hover:bg-zinc-100 transition-colors">キャンセル</button>
+                                </div>
+                             </div>
+                          ` : `
+                            <div class="flex items-center justify-between p-5 bg-white border border-zinc-100 rounded-2xl hover:border-zinc-300 transition-colors group shadow-sm">
+                              <div class="flex items-center gap-4">
+                                <span class="text-zinc-300 font-black text-lg">${idx+1}.</span>
+                                <div><p class="font-bold text-lg text-zinc-900">${escapeHTML(t.title)}</p><p class="text-xs font-bold text-zinc-400 font-mono mt-1 uppercase tracking-wider">${t.type}</p></div>
+                              </div>
+                              <div class="flex gap-2 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button data-action="edit-task" data-tid="${t.id}" class="p-2.5 text-zinc-500 bg-zinc-50 border border-zinc-200 rounded-xl hover:text-zinc-900 hover:bg-white shadow-sm transition-all">${icon('edit',18)}</button>
+                                <button data-action="delete-task" data-tid="${t.id}" data-title="${escapeHTML(t.title)}" class="p-2.5 text-zinc-500 bg-zinc-50 border border-zinc-200 rounded-xl hover:text-red-600 hover:bg-white shadow-sm transition-all">${icon('x',18)}</button>
+                              </div>
                             </div>
-                            <span className={`text-lg font-bold leading-relaxed ${sel[i]===oi?'text-white':'text-zinc-700'}`}>{o}</span>
-                          </label>
-                        ))}
+                          `}
+                        `).join('')}
+                        ${!state.editingTask ? `<button data-action="add-task" data-pid="${p.id}" class="w-full py-5 text-sm font-black text-zinc-400 border-2 border-dashed border-zinc-200 rounded-2xl hover:bg-zinc-50 hover:text-zinc-600 transition-colors flex justify-center items-center gap-2">${icon('edit',18)} 新しいタスクを追加</button>` : ''}
                       </div>
                    </div>
-                 ))}
-               </div>
-               <button onClick={check} disabled={Object.keys(sel).length < data.questions.length} className="w-full py-6 bg-zinc-900 text-white font-black rounded-[2rem] shadow-xl mt-8 disabled:opacity-50 text-xl active:scale-95 transition-transform">採点する</button>
-            </div>
-          );
-        };
+                 `).join('')}
+                 <div class="bg-white border-2 border-dashed border-zinc-200 rounded-[2rem] p-8 flex flex-col md-flex-row gap-4 items-center">
+                    <input type="text" id="newPhaseName" placeholder="新しいフェーズの名前" value="${escapeHTML(state.newPhaseName)}" class="flex-1 bg-zinc-50 font-bold text-lg p-5 rounded-2xl border border-zinc-200"/>
+                    <button data-action="add-phase" class="w-full md-w-auto bg-zinc-900 text-white px-10 py-5 rounded-2xl font-black shadow-md active:scale-95 transition-transform">追加</button>
+                 </div>
+              </div>
+            </div>`;
+        }
 
-        const rootElement = document.getElementById('root');
-        const reactRoot = createRoot(rootElement);
-        reactRoot.render(<App />);
+        function renderTaskExec() {
+            const t = state.activeTask;
+            const u = state.currentUser;
+            const ut = state.userTasks.find(x=>x.taskId===t.id && x.userId===u.id);
+            const isC = ut?.isCompleted;
+
+            let contentHtml = '';
+            if(t.type === 'normal') {
+                contentHtml = `
+                <div class="py-12 text-center">
+                  ${isC ? `
+                    <div class="w-24 h-24 bg-zinc-50 border border-zinc-200 text-zinc-900 rounded-full flex justify-center items-center mx-auto mb-6 shadow-sm">${icon('checkCircle',48)}</div>
+                    <h3 class="text-3xl font-black">完了済み</h3><p class="text-zinc-500 font-bold mt-3 text-lg">このアクションは既に完了しています。</p>
+                  ` : `
+                    <div class="text-zinc-600 bg-zinc-50 border border-zinc-100 p-8 rounded-3xl font-bold mb-10 text-lg shadow-inner">内容を確認・実行し、完了したらボタンを押してください。</div>
+                    <button data-action="complete-task" class="w-full py-6 bg-zinc-900 hover:bg-zinc-800 text-white font-black rounded-[2rem] shadow-xl active:scale-95 transition-all text-xl flex items-center justify-center gap-3">${icon('checkSquare',28)} アクションを完了にする</button>
+                  `}
+                </div>`;
+            } else if(t.type === 'link') {
+                contentHtml = `
+                <div class="py-10 text-center space-y-10">
+                  <div class="text-zinc-700 bg-zinc-50 p-8 rounded-3xl border border-zinc-100 font-bold text-left max-w-md mx-auto shadow-inner text-lg leading-loose">
+                    <p class="flex items-center gap-3"><span class="w-8 h-8 rounded-full bg-zinc-900 text-white flex items-center justify-center text-sm shrink-0">1</span> 下のボタンからリンク先を開く</p>
+                    <p class="flex items-center gap-3 my-4"><span class="w-8 h-8 rounded-full bg-zinc-900 text-white flex items-center justify-center text-sm shrink-0">2</span> 必要な入力や設定を行う</p>
+                    <p class="flex items-center gap-3"><span class="w-8 h-8 rounded-full bg-zinc-900 text-white flex items-center justify-center text-sm shrink-0">3</span> このアプリに戻り完了にする</p>
+                  </div>
+                  <a href="${t.content}" target="_blank" class="inline-flex w-full max-w-md items-center justify-center gap-3 bg-white border-2 border-zinc-900 text-zinc-900 font-black py-6 rounded-[2rem] hover:bg-zinc-50 transition-colors shadow-sm text-xl">${icon('externalLink',28)} リンクを開く</a>
+                  ${isC ? `<div class="text-zinc-600 font-black flex justify-center items-center gap-2 py-5 bg-zinc-100 rounded-[2rem] border border-zinc-200 max-w-md mx-auto text-lg shadow-inner">${icon('checkCircle',24)} 完了済み</div>` 
+                        : `<div><button data-action="complete-task" class="w-full max-w-md py-6 bg-zinc-900 text-white font-black rounded-[2rem] shadow-xl text-xl active:scale-95 transition-transform">完了にする</button></div>`}
+                </div>`;
+            } else if(t.type === 'video') {
+                contentHtml = `
+                <div class="space-y-8 pt-6">
+                  <div class="bg-black rounded-[2rem] overflow-hidden shadow-2xl border-4 border-zinc-100 relative">
+                    <video id="task-video" src="${t.content}" controls controlsList="nodownload nofullscreen noremoteplayback" playsinline data-completed="${isC}" class="w-full aspect-video object-contain"></video>
+                  </div>
+                  <div class="p-6 rounded-3xl text-base flex items-start gap-4 border-2 ${isC ? 'bg-zinc-50 border-zinc-200 text-zinc-600' : 'bg-zinc-900 border-zinc-800 text-white shadow-lg'}">
+                     ${isC ? icon('checkCircle',32,'text-zinc-900 shrink-0 mt-1') : icon('alertCircle',32,'shrink-0 mt-1')}
+                     <p class="font-bold leading-relaxed">${isC ? 'この動画は視聴完了済みです。<br><span class="font-medium text-zinc-500 mt-1 block">自由に早送り・巻き戻しして復習できます。</span>' : '早送りは無効化されています。<br><span class="text-zinc-400 font-medium mt-1 block">最後まで(100%)視聴すると自動完了します。</span>'}</p>
+                  </div>
+                </div>`;
+            } else if(t.type === 'text') {
+                contentHtml = `
+                <div class="space-y-8 pt-6">
+                  ${isC || (ut && !ut.isCompleted) ? `
+                    <div class="text-center py-8">
+                      <div class="w-20 h-20 bg-zinc-50 border border-zinc-200 ${isC?'text-zinc-900':'text-zinc-400'} rounded-full flex justify-center items-center mx-auto mb-6 shadow-sm">${icon(isC?'checkCircle':'messageSquare',40)}</div>
+                      <h3 class="text-2xl font-black">${isC?'承認済み':'提出完了'}</h3>
+                      <p class="text-zinc-500 font-bold mt-2 text-lg">${isC?'上層部からの確認が完了しました。':'管理者の確認をお待ちください。'}</p>
+                      <div class="mt-8 p-8 bg-zinc-50 rounded-[2rem] text-left border border-zinc-200 shadow-inner">
+                        <p class="text-xs font-black text-zinc-400 uppercase tracking-widest mb-4">提出内容</p>
+                        <p class="font-bold whitespace-pre-wrap text-zinc-900 text-lg leading-relaxed">${escapeHTML(ut.textAnswer)}</p>
+                        ${isC && ut.adminComment ? `
+                          <div class="mt-6 pt-6 border-t border-zinc-200">
+                             <p class="text-xs font-black text-zinc-900 uppercase tracking-widest mb-3 flex items-center gap-2">${icon('messageSquare',16)} フィードバック</p>
+                             <p class="font-bold whitespace-pre-wrap text-zinc-700 bg-white p-6 rounded-2xl border border-zinc-100 shadow-sm leading-relaxed">${escapeHTML(ut.adminComment)}</p>
+                          </div>
+                        ` : ''}
+                      </div>
+                    </div>
+                  ` : `
+                    <p class="text-base font-bold text-zinc-600 bg-zinc-50 p-6 rounded-2xl border border-zinc-100 leading-relaxed shadow-sm">稼働してみて思ったこと、良かったこと、悪かったこと、わからなかったことを具体的に言語化してください。</p>
+                    <textarea id="textAnswerInput" rows="8" placeholder="ここに入力..." class="font-bold text-lg p-6 rounded-3xl border-2 border-zinc-200 bg-white shadow-sm"></textarea>
+                    <button data-action="submit-text" class="w-full py-6 bg-zinc-900 text-white font-black rounded-[2rem] shadow-xl text-xl active:scale-95 transition-transform">上層部に提出する</button>
+                  `}
+                </div>`;
+            } else if(t.type === 'test') {
+                let testData = { questions: [], passScore: 100 };
+                try { testData = JSON.parse(t.content); } catch(e){}
+                
+                if(state.testResult) {
+                    contentHtml = `
+                    <div class="text-center py-12 space-y-8 animate-in">
+                      <div class="w-36 h-36 mx-auto rounded-full flex items-center justify-center text-6xl font-black border-4 shadow-xl ${state.testResult.passed?'bg-white border-emerald-500 text-emerald-600':'bg-red-50 border-red-200 text-red-600'}">${state.testResult.score}</div>
+                      <div>
+                        <h3 class="text-4xl font-black mb-3 tracking-tight">${state.testResult.passed?'合格！':'不合格...'}</h3>
+                        <p class="text-zinc-500 font-bold text-lg">${state.testResult.passed?'おめでとうございます！次へ進みましょう。':'復習して再挑戦してください。'}</p>
+                      </div>
+                      <button data-action="save-test" class="w-full py-6 bg-zinc-900 text-white font-black rounded-[2rem] shadow-xl text-xl mt-8 active:scale-95 transition-transform">結果を保存して戻る</button>
+                    </div>`;
+                } else {
+                    const isAllAns = Object.keys(state.testAnswers).length === testData.questions.length;
+                    contentHtml = `
+                    <div class="space-y-10 pt-6">
+                      <div class="flex justify-between items-center bg-zinc-50 p-6 rounded-3xl border border-zinc-200 shadow-sm">
+                         <span class="text-sm font-black tracking-widest uppercase">合格ライン: ${testData.passScore}点</span>
+                         ${isC ? `<span class="text-xs font-bold text-zinc-500 bg-white px-4 py-2 border border-zinc-200 rounded-xl shadow-sm">過去に合格済 (最高: ${ut.score}点)</span>`:''}
+                      </div>
+                      <div class="space-y-8">
+                        ${testData.questions.map((q, i) => `
+                          <div class="bg-white p-8 rounded-[2rem] border border-zinc-200 shadow-sm">
+                            <p class="font-black text-xl leading-relaxed mb-6"><span class="text-zinc-400 mr-3 text-2xl">Q${i+1}.</span>${escapeHTML(q.q)}</p>
+                            <div class="space-y-4">
+                              ${q.options.map((opt, oi) => {
+                                 const sel = state.testAnswers[i] === oi;
+                                 return `
+                                 <label class="flex items-center gap-4 p-5 border-2 rounded-2xl cursor-pointer transition-all ${sel?'border-zinc-900 bg-zinc-900 shadow-lg text-white':'border-zinc-100 bg-white hover:border-zinc-300'}">
+                                   <input type="radio" name="q_${i}" value="${oi}" class="hidden" data-action="test-select" data-qi="${i}" data-oi="${oi}" ${sel?'checked':''}/>
+                                   <div class="w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors ${sel?'border-white':'border-zinc-300'}">
+                                     ${sel?'<div class="w-3 h-3 bg-white rounded-full"></div>':''}
+                                   </div>
+                                   <span class="font-bold text-lg leading-relaxed ${sel?'text-white':'text-zinc-700'}">${escapeHTML(opt)}</span>
+                                 </label>`;
+                              }).join('')}
+                            </div>
+                          </div>
+                        `).join('')}
+                      </div>
+                      <button data-action="score-test" class="w-full py-6 bg-zinc-900 text-white font-black rounded-[2rem] shadow-xl text-xl mt-10 active:scale-95 transition-transform" ${isAllAns?'':'disabled'}>採点する</button>
+                    </div>`;
+                }
+            }
+
+            return `
+            <div class="max-w-3xl mx-auto space-y-8 animate-in pb-16">
+               <button data-action="nav" data-view="dashboard" class="text-zinc-500 font-black text-sm flex items-center gap-2 hover:text-zinc-900 transition-colors">${icon('chevronRight',20,'rotate-180')} 戻る</button>
+               <div class="bg-white p-10 md:p-14 rounded-[3rem] shadow-sm border border-zinc-200">
+                  ${renderBadge(t.type, 'amber')}
+                  <h2 class="text-4xl font-black mt-6 mb-8 tracking-tighter leading-tight">${escapeHTML(t.title)}</h2>
+                  ${contentHtml}
+               </div>
+            </div>`;
+        }
+
+        function renderMainApp() {
+            let mainHtml = '';
+            const v = state.view;
+            if(v === 'dashboard') {
+                if(state.currentUser.role === 'admin') mainHtml = renderAdminDashboard();
+                else mainHtml = renderUserDashboard();
+            } else if(v === 'manage' && state.currentUser.role === 'admin') {
+                mainHtml = renderPhaseManagement();
+            } else if(v === 'userDetail') {
+                mainHtml = renderUserDetail();
+            } else if(v === 'taskExec') {
+                mainHtml = renderTaskExec();
+            }
+
+            return `
+              ${renderSidebar()}
+              <main class="main-content">
+                ${mainHtml}
+              </main>
+            `;
+        }
+
+        // Modals
+        function renderAlertDialog() {
+            return `
+            <div class="modal-overlay" data-action="close-modal">
+                <div class="modal-content" onclick="event.stopPropagation()">
+                    <div class="w-20 h-20 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6 border border-emerald-100 shadow-inner">${icon('checkCircle',40)}</div>
+                    <p class="font-black text-lg text-zinc-900 mb-8 whitespace-pre-wrap leading-relaxed">${escapeHTML(state.alert)}</p>
+                    <button data-action="close-modal" class="w-full py-5 bg-zinc-900 text-white font-black rounded-2xl shadow-xl text-lg active:scale-95 transition-transform">OK</button>
+                </div>
+            </div>`;
+        }
+        
+        function renderConfirmDialog() {
+            return `
+            <div class="modal-overlay" data-action="close-modal">
+                <div class="modal-content" onclick="event.stopPropagation()">
+                    <div class="w-20 h-20 bg-amber-50 text-amber-500 rounded-full flex items-center justify-center mx-auto mb-6 border border-amber-100 shadow-inner">${icon('alertCircle',40)}</div>
+                    <p class="font-black text-lg text-zinc-900 mb-8 whitespace-pre-wrap leading-relaxed">${escapeHTML(state.confirm.msg)}</p>
+                    <div class="flex gap-4">
+                        <button data-action="confirm-yes" class="flex-1 py-5 bg-red-600 text-white font-black rounded-2xl shadow-xl text-lg active:scale-95 transition-transform">はい</button>
+                        <button data-action="close-modal" class="flex-1 py-5 bg-zinc-100 text-zinc-600 font-black rounded-2xl text-lg hover:bg-zinc-200 transition-colors">キャンセル</button>
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        function renderModal() {
+            const root = document.getElementById('modal-root');
+            let html = '';
+            if(state.alert) html += renderAlertDialog();
+            if(state.confirm) html += renderConfirmDialog();
+            root.innerHTML = html;
+        }
+
+        // ==========================================
+        // 6. メインレンダーと初期化
+        // ==========================================
+        function render() {
+            const appRoot = document.getElementById('app');
+            if (state.currentUser) {
+                appRoot.innerHTML = renderMainApp();
+            } else {
+                appRoot.innerHTML = renderAuth();
+            }
+            renderModal();
+            setTimeout(setupVideoPlayer, 0);
+        }
+
+        function init() {
+            document.addEventListener('input', handleGlobalInput);
+            document.addEventListener('change', handleGlobalChange);
+            document.addEventListener('click', handleGlobalClick);
+            render();
+        }
+
+        // ==========================================
+        // 7. イベントバインディング
+        // ==========================================
+        function handleGlobalInput(e) {
+            const el = e.target;
+            if(el.id === 'authName') state.authName = el.value;
+            if(el.id === 'authPass') state.authPass = el.value;
+            if(el.id === 'authSecret') state.authSecret = el.value;
+            if(el.id === 'newPhaseName') state.newPhaseName = el.value;
+            if(el.id === 'newSecretKeyInput') state.newSecretKey = el.value;
+            if(el.dataset.model === 'editTitle') state.editTaskData.title = el.value;
+            if(el.dataset.model === 'editContent') state.editTaskData.content = el.value;
+        }
+
+        function handleGlobalChange(e) {
+            const el = e.target;
+            if(el.id === 'avatarUpload') {
+                const file = el.files[0];
+                if(!file) return;
+                const r = new FileReader();
+                r.onload = ev => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        let w = img.width, h = img.height, max = 150;
+                        if(w>h){if(w>max){h*=max/w;w=max;}}else{if(h>max){w*=max/h;h=max;}}
+                        canvas.width=w; canvas.height=h;
+                        canvas.getContext('2d').drawImage(img,0,0,w,h);
+                        state.authAvatarUrl = canvas.toDataURL('image/jpeg', 0.8);
+                        render();
+                    };
+                    img.src = ev.target.result;
+                };
+                r.readAsDataURL(file);
+            }
+            if(el.dataset.model === 'editType') {
+                state.editTaskData.type = el.value;
+                render();
+            }
+        }
+
+        function handleGlobalClick(e) {
+            const btn = e.target.closest('[data-action]');
+            if (!btn) return;
+            const action = btn.getAttribute('data-action');
+
+            // Modals
+            if (action === 'close-modal') closeModals();
+            if (action === 'confirm-yes') {
+                if(state.confirm && state.confirm.onConfirm) state.confirm.onConfirm();
+                closeModals();
+            }
+
+            // Auth
+            if (action === 'switch-auth') { state.authMode = state.authMode==='login'?'new':'login'; state.authError=''; render(); }
+            if (action === 'toggle-pass') { state.authShowPass = !state.authShowPass; render(); }
+            if (action === 'set-role') { state.authRole = btn.dataset.role; render(); }
+            if (action === 'submit-auth') {
+                state.authError = '';
+                if(!state.authName || !state.authPass) { state.authError = '氏名とパスワードを入力してください'; render(); return; }
+                if(state.authMode === 'new') {
+                    if(state.authRole === 'admin' && state.authSecret !== state.settings.adminSecretKey) {
+                        state.authError = 'シークレットキーが違います'; render(); return;
+                    }
+                    if(state.profiles.some(p=>p.name === state.authName)) {
+                        state.authError = 'その名前は既に存在します'; render(); return;
+                    }
+                    const newId = genId();
+                    const newP = { id: newId, name: state.authName, password: state.authPass, role: state.authRole, avatarUrl: state.authAvatarUrl, lastActiveAt: Date.now(), createdAt: Date.now(), workDays: 0 };
+                    state.profiles.push(newP); save('origin_profiles', state.profiles);
+                    localStorage.setItem('origin_current_id', newId);
+                    state.currentUser = newP;
+                    if(state.authRole==='admin' && state.phases.length===0) seedData();
+                    render();
+                } else {
+                    const match = state.profiles.find(p=>p.name===state.authName && p.password===state.authPass);
+                    if(match) {
+                        match.lastActiveAt = Date.now(); save('origin_profiles', state.profiles);
+                        localStorage.setItem('origin_current_id', match.id);
+                        state.currentUser = match; render();
+                    } else { state.authError = '氏名かパスワードが違います'; render(); }
+                }
+            }
+            if (action === 'logout') {
+                localStorage.removeItem('origin_current_id');
+                state.currentUser = null; state.view = 'dashboard'; state.mobileMenuOpen=false;
+                state.authName = ''; state.authPass = ''; state.authSecret = ''; state.authAvatarUrl = '';
+                render();
+            }
+
+            // Nav
+            if (action === 'nav') { state.view = btn.dataset.view; state.mobileMenuOpen = false; render(); }
+            if (action === 'toggle-menu') { state.mobileMenuOpen = !state.mobileMenuOpen; render(); }
+            if (action === 'reload') { window.location.reload(); }
+
+            // Admin Dashboard
+            if (action === 'select-user') {
+                state.activeTargetUser = state.profiles.find(p=>p.id===btn.dataset.uid);
+                state.view = 'userDetail'; render();
+            }
+
+            // User Dashboard
+            if (action === 'start-work') { handleStartWork(); }
+            if (action === 'select-task') {
+                state.activeTask = state.tasks.find(t=>t.id===btn.dataset.tid);
+                state.testAnswers = {}; state.testResult = null;
+                state.view = 'taskExec'; render();
+            }
+
+            // Task Exec
+            if (action === 'complete-task') { completeTask(state.activeTask.id); }
+            if (action === 'submit-text') { 
+                const text = document.getElementById('textAnswerInput').value;
+                if(text) completeTask(state.activeTask.id, { textAnswer: text });
+            }
+            if (action === 'test-select') {
+                state.testAnswers[btn.dataset.qi] = parseInt(btn.dataset.oi, 10);
+                render();
+            }
+            if (action === 'score-test') {
+                let testData = { questions: [], passScore: 100 };
+                try { testData = JSON.parse(state.activeTask.content); } catch(e){}
+                let correct = 0;
+                testData.questions.forEach((q, i) => { if(state.testAnswers[i] === q.answer) correct++; });
+                const score = Math.round((correct / testData.questions.length) * 100);
+                state.testResult = { score, passed: score >= testData.passScore };
+                render();
+            }
+            if (action === 'save-test') {
+                const ut = state.userTasks.find(x=>x.taskId===state.activeTask.id && x.userId===state.currentUser.id);
+                const max = ut?.score ? Math.max(ut.score, state.testResult.score) : state.testResult.score;
+                const isC = ut?.isCompleted || state.testResult.passed;
+                completeTask(state.activeTask.id, { score: max, attempts: (ut?.attempts||0)+1, isCompleted: isC });
+            }
+
+            // User Detail (Admin Approve)
+            if (action === 'approve-task') {
+                const inp = document.getElementById(`feedback_${btn.dataset.utid}`);
+                const ut = state.userTasks.find(x=>x.id===btn.dataset.utid);
+                if(ut) {
+                    ut.adminComment = inp.value || '確認しました';
+                    ut.isCompleted = true;
+                    save('origin_userTasks', state.userTasks);
+                    render();
+                }
+            }
+
+            // Manage
+            if (action === 'seed-data') seedData();
+            if (action === 'reset-seed-data') {
+                showConfirm("現在のタスクを全て削除し、全39タスクに初期化しますか？\n※ユーザーの進捗は保持されます。", () => {
+                    state.phases = []; state.tasks = [];
+                    save('origin_phases', []); save('origin_tasks', []);
+                    seedData();
+                });
+            }
+            if (action === 'update-secret') {
+                state.settings.adminSecretKey = state.newSecretKey;
+                save('origin_settings', state.settings);
+                showAlert('✅ 管理者シークレットキーを更新しました！');
+            }
+            if (action === 'add-phase') {
+                if(state.newPhaseName) {
+                    state.phases.push({ id: genId(), name: state.newPhaseName, order: state.phases.length+1 });
+                    save('origin_phases', state.phases);
+                    state.newPhaseName = ''; render();
+                }
+            }
+            if (action === 'delete-phase') {
+                showConfirm("フェーズとその中の全タスクを削除しますか？", () => {
+                    state.phases = state.phases.filter(p=>p.id!==btn.dataset.pid); save('origin_phases', state.phases);
+                    state.tasks = state.tasks.filter(t=>t.phaseId!==btn.dataset.pid); save('origin_tasks', state.tasks);
+                    render();
+                });
+            }
+            if (action === 'add-task') {
+                state.tasks.push({ id: genId(), phaseId: btn.dataset.pid, title: '新規タスク', type: 'normal', content: '', order: state.tasks.length+1 });
+                save('origin_tasks', state.tasks); render();
+            }
+            if (action === 'delete-task') {
+                showConfirm(`タスク「${btn.dataset.title}」を削除しますか？`, () => {
+                    state.tasks = state.tasks.filter(t=>t.id!==btn.dataset.tid); save('origin_tasks', state.tasks); render();
+                });
+            }
+            if (action === 'edit-task') {
+                const tk = state.tasks.find(t=>t.id===btn.dataset.tid);
+                if(tk) { state.editingTask = tk; state.editTaskData = { ...tk }; render(); }
+            }
+            if (action === 'cancel-edit') { state.editingTask = null; render(); }
+            if (action === 'save-edit') {
+                Object.assign(state.editingTask, state.editTaskData);
+                save('origin_tasks', state.tasks);
+                state.editingTask = null; render();
+            }
+        }
+
+        // ==========================================
+        // 8. 特殊DOM操作 (Video)
+        // ==========================================
+        function setupVideoPlayer() {
+            const video = document.getElementById('task-video');
+            if(!video || video.dataset.setup === 'true') return;
+            video.dataset.setup = 'true';
+            
+            const isCompleted = video.dataset.completed === 'true';
+            let maxTime = 0;
+            
+            video.addEventListener('timeupdate', () => {
+                if (isCompleted) return;
+                if (video.currentTime > maxTime + 1.5) { video.currentTime = maxTime; } 
+                else { maxTime = Math.max(maxTime, video.currentTime); }
+            });
+            
+            video.addEventListener('ended', () => {
+                if (!isCompleted) completeTask(state.activeTask.id, { completionRate: 100 });
+            });
+        }
+
+        // ==========================================
+        // 起動
+        // ==========================================
+        init();
+
     </script>
 </body>
 </html>
+
+
