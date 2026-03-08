@@ -191,30 +191,18 @@
 
     <script>
         // ==========================================
-        // 1. PWA設定
+        // 1. アプリの起動処理
         // ==========================================
+        // GitHub Pages等のCSPセキュリティ制限でブロックされないように、
+        // 外部スクリプト(ServiceWorker)の動的生成を排除し、安全に初期化します。
         window.addEventListener('DOMContentLoaded', () => {
-            const manifestData = {
-                "name": "ORIGIN Compass", "short_name": "ORIGIN", "start_url": "./", "display": "standalone",
-                "background_color": "#ffffff", "theme_color": "#18181b",
-                "icons": [ { "src": "https://api.dicebear.com/7.x/shapes/svg?seed=origin", "sizes": "192x192", "type": "image/svg+xml" }, { "src": "https://api.dicebear.com/7.x/shapes/svg?seed=origin", "sizes": "512x512", "type": "image/svg+xml" } ]
-            };
-            const manifestBlob = new Blob([JSON.stringify(manifestData)], { type: 'application/json' });
-            const link = document.createElement('link');
-            link.id = 'manifest-link'; link.rel = 'manifest'; link.href = URL.createObjectURL(manifestBlob);
-            document.head.appendChild(link);
-            init();
+            try {
+                init();
+            } catch (e) {
+                console.error("App initialization failed:", e);
+                document.body.innerHTML = '<div style="padding: 2rem; text-align: center;"><h2 style="color: red; font-family: sans-serif;">起動エラーが発生しました</h2><p style="font-family: sans-serif; color: #555;">ブラウザのデータが破損している可能性があります。</p><button onclick="localStorage.clear(); window.location.reload();" style="padding: 10px 20px; margin-top: 20px; background: #18181b; color: white; border: none; border-radius: 8px; cursor: pointer;">データをリセットして再起動</button></div>';
+            }
         });
-
-        if ('serviceWorker' in navigator) {
-            const swCode = `
-                self.addEventListener('install', e => self.skipWaiting());
-                self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k))))); self.clients.claim(); });
-                self.addEventListener('fetch', e => { e.respondWith(fetch(e.request).catch(() => caches.match(e.request))); });
-            `;
-            const swBlob = new Blob([swCode], { type: 'application/javascript' });
-            window.addEventListener('load', () => { navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(err => console.log('SW failed', err)); });
-        }
 
         // ==========================================
         // 2. アイコンデータ
@@ -1368,5 +1356,3 @@
     </script>
 </body>
 </html>
-
-
