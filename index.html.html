@@ -7,37 +7,22 @@
     
     <style>
         /* ==========================================
-           1. カスタムCSS (Tailwindの代替)
+           1. カスタムCSS
            ========================================== */
         :root {
-            --bg-body: #fafafa;
-            --bg-white: #ffffff;
-            --zinc-50: #fafafa;
-            --zinc-100: #f4f4f5;
-            --zinc-200: #e4e4e7;
-            --zinc-300: #d4d4d8;
-            --zinc-400: #a1a1aa;
-            --zinc-500: #71717a;
-            --zinc-600: #52525b;
-            --zinc-800: #27272a;
-            --zinc-900: #18181b;
-            --red-50: #fef2f2;
-            --red-200: #fecaca;
-            --red-600: #dc2626;
-            --amber-50: #fffbeb;
-            --amber-200: #fde68a;
-            --amber-700: #b45309;
-            --emerald-50: #ecfdf5;
-            --emerald-200: #a7f3d0;
-            --emerald-600: #059669;
-            --shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
-            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
-            --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.1);
-            --radius-lg: 0.75rem;
-            --radius-xl: 1rem;
-            --radius-2xl: 1.5rem;
-            --radius-full: 9999px;
+            --bg-body: #fafafa; --bg-white: #ffffff;
+            --zinc-50: #fafafa; --zinc-100: #f4f4f5; --zinc-200: #e4e4e7; --zinc-300: #d4d4d8;
+            --zinc-400: #a1a1aa; --zinc-500: #71717a; --zinc-600: #52525b; --zinc-700: #3f3f46;
+            --zinc-800: #27272a; --zinc-900: #18181b;
+            --red-50: #fef2f2; --red-200: #fecaca; --red-600: #dc2626;
+            --amber-50: #fffbeb; --amber-100: #fef3c7; --amber-200: #fde68a;
+            --amber-500: #f59e0b; --amber-600: #d97706; --amber-700: #b45309;
+            --emerald-50: #ecfdf5; --emerald-100: #d1fae5; --emerald-200: #a7f3d0;
+            --emerald-500: #10b981; --emerald-600: #059669;
+            --shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.05); --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1); --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.1);
+            --shadow-inner: inset 0 2px 4px 0 rgba(0,0,0,0.06);
+            --radius-lg: 0.75rem; --radius-xl: 1rem; --radius-2xl: 1.5rem; --radius-full: 9999px;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
@@ -56,55 +41,92 @@
         /* Typography */
         .text-xs { font-size: 0.75rem; } .text-sm { font-size: 0.875rem; } .text-base { font-size: 1rem; }
         .text-lg { font-size: 1.125rem; } .text-xl { font-size: 1.25rem; } .text-2xl { font-size: 1.5rem; }
-        .text-3xl { font-size: 1.875rem; } .text-4xl { font-size: 2.25rem; } .text-5xl { font-size: 3rem; }
+        .text-3xl { font-size: 1.875rem; } .text-4xl { font-size: 2.25rem; } .text-5xl { font-size: 3rem; } .text-6xl { font-size: 3.75rem; }
         .font-medium { font-weight: 500; } .font-bold { font-weight: 700; } .font-black { font-weight: 900; }
-        .text-center { text-align: center; } .text-right { text-align: right; }
-        .text-zinc-400 { color: var(--zinc-400); } .text-zinc-500 { color: var(--zinc-500); }
-        .text-zinc-600 { color: var(--zinc-600); } .text-zinc-900 { color: var(--zinc-900); }
-        .text-white { color: var(--bg-white); } .text-red-600 { color: var(--red-600); }
+        .text-center { text-align: center; } .text-right { text-align: right; } .text-left { text-align: left; }
+        .text-zinc-300 { color: var(--zinc-300); } .text-zinc-400 { color: var(--zinc-400); } .text-zinc-500 { color: var(--zinc-500); }
+        .text-zinc-600 { color: var(--zinc-600); } .text-zinc-700 { color: var(--zinc-700); } .text-zinc-800 { color: var(--zinc-800); }
+        .text-zinc-900 { color: var(--zinc-900); } .text-white { color: var(--bg-white); }
+        .text-red-600 { color: var(--red-600); } .text-amber-500 { color: var(--amber-500); } .text-amber-600 { color: var(--amber-600); }
+        .text-emerald-500 { color: var(--emerald-500); } .text-emerald-600 { color: var(--emerald-600); }
         .uppercase { text-transform: uppercase; } .tracking-wider { letter-spacing: 0.05em; } .tracking-widest { letter-spacing: 0.1em; }
+        .tracking-tight { letter-spacing: -0.025em; } .tracking-tighter { letter-spacing: -0.05em; }
         .line-through { text-decoration: line-through; } .whitespace-pre-wrap { white-space: pre-wrap; }
+        .leading-relaxed { line-height: 1.625; } .leading-loose { line-height: 2; } .leading-none { line-height: 1; }
 
         /* Layout */
         .flex { display: flex; } .flex-col { flex-direction: column; } .flex-1 { flex: 1; }
-        .items-center { align-items: center; } .items-end { align-items: flex-end; }
+        .items-center { align-items: center; } .items-start { align-items: flex-start; } .items-end { align-items: flex-end; }
         .justify-center { justify-content: center; } .justify-between { justify-content: space-between; }
         .flex-wrap { flex-wrap: wrap; } .shrink-0 { flex-shrink: 0; }
-        .gap-2 { gap: 0.5rem; } .gap-3 { gap: 0.75rem; } .gap-4 { gap: 1rem; } .gap-6 { gap: 1.5rem; } .gap-8 { gap: 2rem; }
+        .gap-1 { gap: 0.25rem; } .gap-1\.5 { gap: 0.375rem; } .gap-2 { gap: 0.5rem; } .gap-3 { gap: 0.75rem; } 
+        .gap-4 { gap: 1rem; } .gap-5 { gap: 1.25rem; } .gap-6 { gap: 1.5rem; } .gap-8 { gap: 2rem; } .gap-10 { gap: 2.5rem; }
 
         .w-full { width: 100%; } .h-full { height: 100%; }
-        .w-8 { width: 2rem; } .h-8 { height: 2rem; }
-        .w-12 { width: 3rem; } .h-12 { height: 3rem; }
-        .w-16 { width: 4rem; } .h-16 { height: 4rem; }
-        .max-w-md { max-width: 28rem; } .max-w-2xl { max-width: 42rem; } .max-w-4xl { max-width: 56rem; }
+        .w-2 { width: 0.5rem; } .h-2 { height: 0.5rem; } .w-3 { width: 0.75rem; } .h-3 { height: 0.75rem; }
+        .w-6 { width: 1.5rem; } .h-6 { height: 1.5rem; } .w-7 { width: 1.75rem; } .h-7 { height: 1.75rem; }
+        .w-8 { width: 2rem; } .h-8 { height: 2rem; } .w-10 { width: 2.5rem; } .h-10 { height: 2.5rem; }
+        .w-12 { width: 3rem; } .h-12 { height: 3rem; } .w-14 { width: 3.5rem; } .h-14 { height: 3.5rem; }
+        .w-16 { width: 4rem; } .h-16 { height: 4rem; } .w-20 { width: 5rem; } .h-20 { height: 5rem; }
+        .w-24 { width: 6rem; } .h-24 { height: 6rem; } .w-28 { width: 7rem; } .h-28 { height: 7rem; }
+        .w-36 { width: 9rem; } .h-36 { height: 9rem; }
+        
+        .max-w-sm { max-width: 24rem; } .max-w-md { max-width: 28rem; } 
+        .max-w-2xl { max-width: 42rem; } .max-w-3xl { max-width: 48rem; } .max-w-4xl { max-width: 56rem; }
         .mx-auto { margin-left: auto; margin-right: auto; }
-        .mt-2 { margin-top: 0.5rem; } .mt-4 { margin-top: 1rem; } .mt-6 { margin-top: 1.5rem; } .mt-8 { margin-top: 2rem; }
-        .mb-2 { margin-bottom: 0.5rem; } .mb-4 { margin-bottom: 1rem; } .mb-6 { margin-bottom: 1.5rem; } .mb-8 { margin-bottom: 2rem; }
-        .p-4 { padding: 1rem; } .p-6 { padding: 1.5rem; } .p-8 { padding: 2rem; }
+        .min-h-screen { min-height: 100vh; } .min-w-\[160px\] { min-width: 160px; } .min-w-\[180px\] { min-width: 180px; }
+
+        .m-2 { margin: 0.5rem; } .mt-1 { margin-top: 0.25rem; } .mt-2 { margin-top: 0.5rem; } .mt-3 { margin-top: 0.75rem; }
+        .mt-4 { margin-top: 1rem; } .mt-5 { margin-top: 1.25rem; } .mt-6 { margin-top: 1.5rem; } .mt-8 { margin-top: 2rem; } .mt-10 { margin-top: 2.5rem; }
+        .mb-1 { margin-bottom: 0.25rem; } .mb-2 { margin-bottom: 0.5rem; } .mb-3 { margin-bottom: 0.75rem; }
+        .mb-4 { margin-bottom: 1rem; } .mb-5 { margin-bottom: 1.25rem; } .mb-6 { margin-bottom: 1.5rem; } .mb-8 { margin-bottom: 2rem; } .mb-10 { margin-bottom: 2.5rem; }
+        .ml-2 { margin-left: 0.5rem; } .ml-4 { margin-left: 1rem; } .ml-9 { margin-left: 2.25rem; } .ml-10 { margin-left: 2.5rem; }
+        .mr-1 { margin-right: 0.25rem; } .mr-2 { margin-right: 0.5rem; } .mr-3 { margin-right: 0.75rem; }
+        
+        .p-2 { padding: 0.5rem; } .p-3 { padding: 0.75rem; } .p-4 { padding: 1rem; } 
+        .p-5 { padding: 1.25rem; } .p-6 { padding: 1.5rem; } .p-8 { padding: 2rem; } .p-10 { padding: 2.5rem; }
+        .px-3 { padding-left: 0.75rem; padding-right: 0.75rem; } .py-1\.5 { padding-top: 0.375rem; padding-bottom: 0.375rem; }
         .px-4 { padding-left: 1rem; padding-right: 1rem; } .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+        .px-5 { padding-left: 1.25rem; padding-right: 1.25rem; } .py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
         .px-6 { padding-left: 1.5rem; padding-right: 1.5rem; } .py-4 { padding-top: 1rem; padding-bottom: 1rem; }
-        .pt-6 { padding-top: 1.5rem; } .pb-12 { padding-bottom: 3rem; }
+        .px-8 { padding-left: 2rem; padding-right: 2rem; } .py-5 { padding-top: 1.25rem; padding-bottom: 1.25rem; } .py-6 { padding-top: 1.5rem; padding-bottom: 1.5rem; }
+        .pt-2 { padding-top: 0.5rem; } .pt-4 { padding-top: 1rem; } .pt-5 { padding-top: 1.25rem; } .pt-6 { padding-top: 1.5rem; } .pt-8 { padding-top: 2rem; }
+        .pb-6 { padding-bottom: 1.5rem; } .pb-12 { padding-bottom: 3rem; } .pb-16 { padding-bottom: 4rem; }
         
         .relative { position: relative; } .absolute { position: absolute; }
         .inset-0 { top: 0; right: 0; bottom: 0; left: 0; } .inset-y-0 { top: 0; bottom: 0; } .right-0 { right: 0; }
 
         /* Backgrounds & Borders */
-        .bg-white { background-color: var(--bg-white); } .bg-zinc-50 { background-color: var(--zinc-50); }
-        .bg-zinc-100 { background-color: var(--zinc-100); } .bg-zinc-900 { background-color: var(--zinc-900); }
-        .border { border: 1px solid var(--zinc-200); } .border-2 { border: 2px solid var(--zinc-200); }
+        .bg-white { background-color: var(--bg-white); } .bg-black { background-color: #000; }
+        .bg-zinc-50 { background-color: var(--zinc-50); } .bg-zinc-100 { background-color: var(--zinc-100); }
+        .bg-zinc-200 { background-color: var(--zinc-200); } .bg-zinc-800 { background-color: var(--zinc-800); }
+        .bg-zinc-900 { background-color: var(--zinc-900); }
+        .bg-red-50 { background-color: var(--red-50); } .bg-red-600 { background-color: var(--red-600); }
+        .bg-amber-50 { background-color: var(--amber-50); } .bg-amber-100 { background-color: var(--amber-100); }
+        .bg-emerald-50 { background-color: var(--emerald-50); } .bg-emerald-100 { background-color: var(--emerald-100); }
+
+        .border { border: 1px solid var(--zinc-200); } .border-2 { border: 2px solid var(--zinc-200); } .border-4 { border: 4px solid var(--zinc-200); }
+        .border-zinc-100 { border-color: var(--zinc-100); } .border-zinc-200 { border-color: var(--zinc-200); } 
+        .border-zinc-300 { border-color: var(--zinc-300); } .border-zinc-700 { border-color: var(--zinc-700); }
+        .border-zinc-800 { border-color: var(--zinc-800); } .border-zinc-900 { border-color: var(--zinc-900); }
+        .border-amber-100 { border-color: var(--amber-100); } .border-amber-200 { border-color: var(--amber-200); }
+        .border-emerald-100 { border-color: var(--emerald-100); } .border-red-200 { border-color: var(--red-200); }
         .border-t { border-top: 1px solid var(--zinc-200); } .border-b { border-bottom: 1px solid var(--zinc-200); }
+        .border-dashed { border-style: dashed; }
+        
         .rounded-lg { border-radius: var(--radius-lg); } .rounded-xl { border-radius: var(--radius-xl); }
-        .rounded-2xl { border-radius: var(--radius-2xl); } .rounded-3xl { border-radius: 2rem; }
+        .rounded-2xl { border-radius: var(--radius-2xl); } .rounded-3xl { border-radius: 2rem; } .rounded-\[2\.5rem\] { border-radius: 2.5rem; } .rounded-\[2rem\] { border-radius: 2rem; } .rounded-\[3rem\] { border-radius: 3rem; }
         .rounded-full { border-radius: var(--radius-full); }
+        
         .shadow-sm { box-shadow: var(--shadow-sm); } .shadow-md { box-shadow: var(--shadow-md); }
-        .shadow-lg { box-shadow: var(--shadow-lg); } .shadow-xl { box-shadow: var(--shadow-xl); }
-        .overflow-hidden { overflow: hidden; } .object-cover { object-fit: cover; }
+        .shadow-lg { box-shadow: var(--shadow-lg); } .shadow-xl { box-shadow: var(--shadow-xl); } .shadow-inner { box-shadow: var(--shadow-inner); }
+        .overflow-hidden { overflow: hidden; } .object-cover { object-fit: cover; } .aspect-video { aspect-ratio: 16 / 9; } .resize-none { resize: none; }
 
         /* UI Components */
-        .btn-primary { background-color: var(--zinc-900); color: var(--bg-white); font-weight: bold; padding: 1rem 1.5rem; border-radius: var(--radius-xl); display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; width: 100%; box-shadow: var(--shadow-md); }
-        .btn-primary:hover { background-color: var(--zinc-800); }
+        .btn-primary { background-color: var(--zinc-900); color: var(--bg-white); font-weight: bold; padding: 1rem 1.5rem; border-radius: var(--radius-xl); display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; width: 100%; box-shadow: var(--shadow-md); transition: all 0.2s; }
+        .btn-primary:hover:not(:disabled) { background-color: var(--zinc-800); }
         
-        .badge { padding: 0.25rem 0.5rem; border-radius: var(--radius-full); font-size: 0.7rem; font-weight: 900; border: 1px solid; display: inline-flex; align-items: center; gap: 0.25rem; white-space: nowrap; text-transform: uppercase;}
+        .badge { padding: 0.25rem 0.6rem; border-radius: var(--radius-full); font-size: 0.7rem; font-weight: 900; border: 1px solid; display: inline-flex; align-items: center; gap: 0.25rem; white-space: nowrap; text-transform: uppercase;}
         .badge-red { background: var(--red-50); color: var(--red-600); border-color: var(--red-200); }
         .badge-amber { background: var(--amber-50); color: var(--amber-700); border-color: var(--amber-200); }
         .badge-emerald { background: var(--emerald-50); color: var(--emerald-600); border-color: var(--emerald-200); }
@@ -116,8 +138,8 @@
         
         .app-layout { display: flex; flex-direction: column; min-height: 100vh; }
         .sidebar { display: none; }
-        .mobile-header { display: flex; align-items: center; justify-content: space-between; padding: 1rem; background: var(--bg-white); border-bottom: 1px solid var(--zinc-200); position: sticky; top: 0; z-index: 30; }
-        .main-content { flex: 1; padding: 1rem; overflow-y: auto; width: 100%; max-width: 72rem; margin: 0 auto; }
+        .mobile-header { display: flex; align-items: center; justify-content: space-between; padding: 1.25rem; background: var(--bg-white); border-bottom: 1px solid var(--zinc-200); position: sticky; top: 0; z-index: 30; }
+        .main-content { flex: 1; padding: 1.25rem; overflow-y: auto; width: 100%; max-width: 72rem; margin: 0 auto; }
         .mobile-menu { position: fixed; inset: 0; background: var(--bg-white); z-index: 40; padding: 1.5rem; display: flex; flex-direction: column; }
         
         @media (min-width: 768px) {
@@ -131,12 +153,28 @@
             .md-items-center { align-items: center; }
             .md-items-end { align-items: flex-end; }
             .md-w-auto { width: auto; }
+            .md-px-8 { padding-left: 2rem; padding-right: 2rem; }
+            .md-p-8 { padding: 2rem; }
+            .md-p-10 { padding: 2.5rem; }
+            .md-p-14 { padding: 3.5rem; }
         }
 
         /* Nav Items */
         .nav-item { display: flex; align-items: center; gap: 0.75rem; padding: 1rem 1.5rem; color: var(--zinc-500); font-weight: bold; font-size: 0.875rem; transition: background 0.2s; border-radius: var(--radius-xl); margin: 0.25rem 0; width: 100%; justify-content: flex-start; }
         .nav-item:hover { background: var(--zinc-50); color: var(--zinc-900); }
         .nav-item.active { background: var(--zinc-900); color: var(--bg-white); box-shadow: var(--shadow-md); }
+
+        /* Helpers & States */
+        .group:hover .group-hover\:opacity-100 { opacity: 1; }
+        .group:hover .group-hover\:translate-x-1 { transform: translateX(0.25rem); }
+        .transition-colors { transition-property: color, background-color, border-color, text-decoration-color, fill, stroke; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 150ms; }
+        .transition-all { transition-property: all; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 150ms; }
+        .transition-transform { transition-property: transform; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 150ms; }
+        .rotate-180 { transform: rotate(180deg); }
+        
+        .opacity-0 { opacity: 0; } .opacity-5 { opacity: 0.05; } .opacity-50 { opacity: 0.5; } .opacity-100 { opacity: 1; }
+        
+        .divide-y > * + * { border-top: 1px solid var(--zinc-100); }
 
         /* Animations */
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -148,58 +186,38 @@
     </style>
 </head>
 <body>
-    <!-- アプリの描画領域 -->
     <div id="app" class="app-layout"></div>
-
-    <!-- モーダル描画領域 -->
     <div id="modal-root"></div>
 
     <script>
         // ==========================================
-        // 1. PWA（スマホアプリ化）設定
+        // 1. PWA設定
         // ==========================================
         window.addEventListener('DOMContentLoaded', () => {
             const manifestData = {
-                "name": "ORIGIN Compass",
-                "short_name": "ORIGIN",
-                "start_url": "./",
-                "display": "standalone",
-                "background_color": "#ffffff",
-                "theme_color": "#18181b",
-                "icons": [
-                    { "src": "https://api.dicebear.com/7.x/shapes/svg?seed=origin", "sizes": "192x192", "type": "image/svg+xml" },
-                    { "src": "https://api.dicebear.com/7.x/shapes/svg?seed=origin", "sizes": "512x512", "type": "image/svg+xml" }
-                ]
+                "name": "ORIGIN Compass", "short_name": "ORIGIN", "start_url": "./", "display": "standalone",
+                "background_color": "#ffffff", "theme_color": "#18181b",
+                "icons": [ { "src": "https://api.dicebear.com/7.x/shapes/svg?seed=origin", "sizes": "192x192", "type": "image/svg+xml" }, { "src": "https://api.dicebear.com/7.x/shapes/svg?seed=origin", "sizes": "512x512", "type": "image/svg+xml" } ]
             };
             const manifestBlob = new Blob([JSON.stringify(manifestData)], { type: 'application/json' });
-            const manifestUrl = URL.createObjectURL(manifestBlob);
-            
             const link = document.createElement('link');
-            link.id = 'manifest-link';
-            link.rel = 'manifest';
-            link.href = manifestUrl;
+            link.id = 'manifest-link'; link.rel = 'manifest'; link.href = URL.createObjectURL(manifestBlob);
             document.head.appendChild(link);
+            init();
         });
 
         if ('serviceWorker' in navigator) {
             const swCode = `
                 self.addEventListener('install', e => self.skipWaiting());
-                self.addEventListener('activate', e => {
-                    e.waitUntil(caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k)))));
-                    self.clients.claim();
-                });
-                self.addEventListener('fetch', e => {
-                    e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
-                });
+                self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k))))); self.clients.claim(); });
+                self.addEventListener('fetch', e => { e.respondWith(fetch(e.request).catch(() => caches.match(e.request))); });
             `;
             const swBlob = new Blob([swCode], { type: 'application/javascript' });
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(err => console.log('SW failed', err));
-            });
+            window.addEventListener('load', () => { navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(err => console.log('SW failed', err)); });
         }
 
         // ==========================================
-        // 2. アイコンデータ (SVGを直接埋め込み)
+        // 2. アイコンデータ
         // ==========================================
         const icons = {
             users: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
@@ -236,17 +254,20 @@
         const genId = () => 'id_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
         const getTodayStr = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; };
         
-        const load = (key, def) => { const d = localStorage.getItem(key); return d ? JSON.parse(d) : def; };
-        const save = (key, data) => localStorage.setItem(key, JSON.stringify(data));
+        const load = (key, def) => { 
+            try { const d = localStorage.getItem(key); return d ? JSON.parse(d) : def; } 
+            catch(e) { return def; }
+        };
+        const save = (key, data) => { try { localStorage.setItem(key, JSON.stringify(data)); } catch(e) {} };
 
         const MILESTONE_TASKS = ['初めてのアポを取る', '初めての受注をする', '2件目のアポを取る', '2件目の受注をする', '3件目 受注する', '4件目 受注する（料金説明までやる）', 'アポインター 卒業する'];
 
         let state = {
-            profiles: load('origin_profiles', []),
-            phases: load('origin_phases', []),
-            tasks: load('origin_tasks', []),
-            userTasks: load('origin_userTasks', []),
-            settings: load('origin_settings', { adminSecretKey: 'origin2026' }),
+            profiles: load('origin_profiles', []) || [],
+            phases: load('origin_phases', []) || [],
+            tasks: load('origin_tasks', []) || [],
+            userTasks: load('origin_userTasks', []) || [],
+            settings: load('origin_settings', { adminSecretKey: 'origin2026' }) || { adminSecretKey: 'origin2026' },
             currentUser: null,
             view: 'dashboard',
             activeTask: null,
@@ -263,20 +284,29 @@
             authError: '',
             mobileMenuOpen: false,
             
+            // Dashboard Filters
+            filter: 'all',
+
+            // Editing state
             editingTask: null, 
             editTaskData: {},
             newPhaseName: '',
             newSecretKey: '',
+            
+            // New Task State
+            newTaskPhaseId: null,
+            newTaskData: { title: '', type: 'normal', content: '' },
+
             testAnswers: {},
             testResult: null,
             
             // Modals
-            confirm: null, // { msg, onConfirm }
-            alert: null,   // string
+            confirm: null,
+            alert: null,
         };
 
         // 初期ロード
-        const sid = localStorage.getItem('origin_current_id');
+        const sid = load('origin_current_id', null);
         if (sid) {
             state.currentUser = state.profiles.find(p => p.id === sid);
             if(state.currentUser) {
@@ -292,18 +322,78 @@
         function showConfirm(msg, onConfirm) { state.confirm = { msg, onConfirm }; render(); }
         function closeModals() { state.alert = null; state.confirm = null; render(); }
 
-        function seedData() {
+        // ★ 完全な39タスクのデータを復元
+        function seedData(append = false) {
             const pData = [
-              { name: 'フェーズ1: 入社準備', tasks: [{type:'link', title:'名簿作成', content:'https://google.com'}, {type:'test', title:'理解度テスト', content:'{"passScore":100,"questions":[{"q":"準備はOK？","options":["はい","いいえ"],"answer":0}]}'}] },
-              { name: 'フェーズ2: 初稼働', tasks: [{type:'normal', title:'初めてのアポを取る'}, {type:'text', title:'稼働の振り返り'}, {type:'video', title:'ロープレ動画', content:'https://www.w3schools.com/html/mov_bbb.mp4'}] },
-              { name: 'フェーズ3: アポインター卒業', tasks: [{type:'normal', title:'2件目のアポを取る'}, {type:'normal', title:'初めての受注をする'}, {type:'normal', title:'アポインター 卒業する'}] },
-              { name: 'フェーズ4: クローザーへの道', tasks: [{type:'video', title:'クローザー動画', content:'https://www.w3schools.com/html/mov_bbb.mp4'}, {type:'normal', title:'クローザー として稼働する'}] }
+              {
+                name: 'フェーズ1: 入社準備と基礎インプット',
+                tasks: [
+                  { type: 'link', title: '従業員名簿作成フォームを入力', content: 'https://forms.gle/' },
+                  { type: 'video', title: 'ロープレ動画を視聴する', content: 'https://www.w3schools.com/html/mov_bbb.mp4' },
+                  { type: 'test', title: 'ロープレテスト', content: JSON.stringify({ passScore: 100, questions: [{q: "ロープレ内容の確認テスト（※後で管理者が編集してください）", options:["はい","いいえ"], answer:0}] }) },
+                  { type: 'normal', title: 'Gmailアカウント作成' },
+                  { type: 'normal', title: 'エルリード名簿登録' },
+                  { type: 'normal', title: '業務委託証の写真を提出' },
+                  { type: 'link', title: '月間計画表を記入', content: 'https://docs.google.com/spreadsheets/' },
+                  { type: 'link', title: '各Lineグループに追加', content: 'https://line.me/' },
+                  { type: 'link', title: 'ドロボのアカウントに登録', content: 'https://example.com/dorobo' },
+                  { type: 'link', title: 'Googleマップのアカウントに登録', content: 'https://maps.google.com/' },
+                  { type: 'link', title: 'ポチポチロガーのアプリに登録', content: 'https://example.com/logger' },
+                  { type: 'normal', title: 'コンプライアンス研修を受ける' },
+                  { type: 'normal', title: '法律遵守 研修' },
+                  { type: 'video', title: '自社商材研修の動画を視聴する', content: 'https://www.w3schools.com/html/mov_bbb.mp4' },
+                  { type: 'test', title: '商材テストに合格する', content: JSON.stringify({ passScore: 100, questions: [{q: "商材テストの確認（※後で管理者が編集してください）", options:["はい","いいえ"], answer:0}] }) },
+                ]
+              },
+              {
+                name: 'フェーズ2: 実践準備と初稼働',
+                tasks: [
+                  { type: 'normal', title: 'クローザーの同行に行く' },
+                  { type: 'normal', title: 'ドロボの書き方を教えてもらう' },
+                  { type: 'normal', title: 'リスト出し、エリア選びのやり方を勉強する' },
+                  { type: 'text', title: '同行後 感じたこと 気になることをメモに書いて 上層部に送信' },
+                  { type: 'normal', title: '1人で稼働してみる' },
+                  { type: 'text', title: '稼働してみて思ったこと、良かったこと、悪かったこと、わからなかったことを言語化してみる' },
+                  { type: 'normal', title: 'アウト返し集 の知識を入れる' },
+                  { type: 'normal', title: '初めてのアポを取る' },
+                  { type: 'text', title: 'どうしたら契約が取れるか 何が必要か 何が足りないかを言語化して送信する' },
+                  { type: 'normal', title: '初めての受注をする' },
+                ]
+              },
+              {
+                name: 'フェーズ3: アポインター卒業へ',
+                tasks: [
+                  { type: 'normal', title: '他社の商材知識を入れる' },
+                  { type: 'normal', title: '2件目のアポを取る' },
+                  { type: 'normal', title: '2件目の受注をする' },
+                  { type: 'normal', title: '3件目 受注する' },
+                  { type: 'video', title: '紙プレ動画を見る', content: 'https://www.w3schools.com/html/mov_bbb.mp4' },
+                  { type: 'test', title: '紙プレの ロープレテストへ 合格', content: JSON.stringify({ passScore: 100, questions: [{q: "紙プレテストの確認（※後で管理者が編集してください）", options:["はい","いいえ"], answer:0}] }) },
+                  { type: 'normal', title: '4件目 受注する（料金説明までやる）' },
+                  { type: 'video', title: 'アトカクフォームの書き方と投げ方の動画を見る', content: 'https://www.w3schools.com/html/mov_bbb.mp4' },
+                  { type: 'normal', title: 'アポインター 卒業する' },
+                ]
+              },
+              {
+                name: 'フェーズ4: クローザーへの道',
+                tasks: [
+                  { type: 'video', title: 'クローザー用 ロープレ動画を見る', content: 'https://www.w3schools.com/html/mov_bbb.mp4' },
+                  { type: 'test', title: 'クローザー用 ロープレテストへ 合格する', content: JSON.stringify({ passScore: 100, questions: [{q: "クローザーテストの確認（※後で管理者が編集してください）", options:["はい","いいえ"], answer:0}] }) },
+                  { type: 'normal', title: 'クローザー として稼働する' },
+                  { type: 'normal', title: '商材知識 を増やす （UQトスアップや 電気トスアップについて）' },
+                  { type: 'video', title: 'だるい系客用の ロープレ動画を見る', content: 'https://www.w3schools.com/html/mov_bbb.mp4' },
+                  { type: 'normal', title: '細かい営業テクニックとアウトの引き出しを増やす' },
+                ]
+              }
             ];
             
-            let newPh = [], newTk = [];
+            let newPh = append ? [...state.phases] : [];
+            let newTk = append ? [...state.tasks] : [];
+            const maxOrder = newPh.length > 0 ? Math.max(...newPh.map(p => p.order)) : 0;
+
             pData.forEach((p, i) => {
                 const pid = genId();
-                newPh.push({ id: pid, name: p.name, order: i+1 });
+                newPh.push({ id: pid, name: p.name, order: maxOrder + i + 1 });
                 p.tasks.forEach((t, j) => { newTk.push({ id: genId(), phaseId: pid, order: j+1, ...t }); });
             });
             state.phases = newPh; save('origin_phases', state.phases);
@@ -312,6 +402,7 @@
         }
 
         function handleStartWork() {
+            if(!state.currentUser) return;
             if(state.currentUser.lastWorkDate === getTodayStr()) return;
             state.currentUser.lastWorkDate = getTodayStr();
             state.currentUser.workDays = (state.currentUser.workDays || 0) + 1;
@@ -320,8 +411,10 @@
         }
 
         function completeTask(taskId, extra = {}) {
+            if(!state.currentUser) return;
             const existing = state.userTasks.find(u => u.taskId === taskId && u.userId === state.currentUser.id);
             const tk = state.tasks.find(t=>t.id===taskId);
+            if(!tk) return;
             
             const data = { 
                 userId: state.currentUser.id, taskId, 
@@ -412,7 +505,7 @@
         }
 
         function renderSidebar() {
-            const isAdmin = state.currentUser.role === 'admin';
+            const isAdmin = state.currentUser && state.currentUser.role === 'admin';
             const v = state.view;
             return `
               <nav class="sidebar z-10">
@@ -428,9 +521,9 @@
                    <div class="flex items-center justify-between ${isAdmin?'pt-3 border-t border-zinc-200':''}">
                      <div class="flex items-center gap-3 overflow-hidden">
                        <div class="w-10 h-10 rounded-full bg-zinc-900 flex items-center justify-center text-white font-bold shrink-0 overflow-hidden">
-                          ${state.currentUser.avatarUrl ? `<img src="${state.currentUser.avatarUrl}" class="w-full h-full object-cover"/>` : state.currentUser.name[0]}
+                          ${state.currentUser?.avatarUrl ? `<img src="${state.currentUser.avatarUrl}" class="w-full h-full object-cover"/>` : (state.currentUser?.name?.[0] || '?')}
                        </div>
-                       <div class="truncate"><p class="text-sm font-black truncate">${escapeHTML(state.currentUser.name)}</p><p class="text-xs text-zinc-500 font-bold">${isAdmin?'管理者':'新人'}</p></div>
+                       <div class="truncate"><p class="text-sm font-black truncate">${escapeHTML(state.currentUser?.name)}</p><p class="text-xs text-zinc-500 font-bold">${isAdmin?'管理者':'新人'}</p></div>
                      </div>
                      <button data-action="logout" class="text-zinc-400 hover:text-zinc-900 transition-colors">${icon('logOut', 18)}</button>
                    </div>
@@ -461,30 +554,37 @@
             const users = state.profiles.filter(p => p.role === 'user');
             
             let totalPending = 0;
-            const userHtml = users.length === 0 ? `<div class="p-12 text-center font-bold text-zinc-400">新人がいません</div>` : users.map(u => {
+            const analyzedUsers = users.map(u => {
                 const c = state.userTasks.filter(ut => ut.userId === u.id && ut.isCompleted).length;
                 const prog = state.tasks.length ? Math.round((c / state.tasks.length)*100) : 0;
                 const pend = state.userTasks.filter(ut => ut.userId === u.id && !ut.isCompleted && ut.textAnswer && !ut.adminComment).length;
                 totalPending += pend;
-                const isInactive = (Date.now() - (u.lastActiveAt||u.createdAt)) > 259200000; // 3 days
-                
-                return `
+                const isInactive = (Date.now() - (u.lastActiveAt||u.createdAt)) > 259200000;
+                return { ...u, progress: prog, pendingTexts: pend, isInactive };
+            });
+
+            const filteredUsers = analyzedUsers.filter(u => {
+                if (state.filter === 'inactive') return u.isInactive;
+                if (state.filter === 'action_required') return u.pendingTexts > 0;
+                return true;
+            });
+
+            const userHtml = filteredUsers.length === 0 ? `<div class="p-12 text-center font-bold text-zinc-400">該当するユーザーはいません</div>` : filteredUsers.map(u => `
                 <div class="p-6 border-b border-zinc-100 flex items-center justify-between cursor-pointer hover:bg-zinc-50 transition-colors" data-action="select-user" data-uid="${u.id}">
                   <div class="flex items-center gap-4">
                     <div class="w-12 h-12 rounded-full bg-zinc-100 overflow-hidden flex items-center justify-center font-bold border border-zinc-200 shrink-0">
                       ${u.avatarUrl ? `<img src="${u.avatarUrl}" class="w-full h-full object-cover"/>` : u.name[0]}
                     </div>
                     <div>
-                      <p class="font-black text-lg flex items-center flex-wrap gap-2">${escapeHTML(u.name)} ${isInactive?renderBadge('警告:未稼働','red'):''} ${pend>0?renderBadge('言語化あり','gray'):''}</p>
+                      <p class="font-black text-lg flex items-center flex-wrap gap-2">${escapeHTML(u.name)} ${u.isInactive?renderBadge('警告:未稼働','red'):''} ${u.pendingTexts>0?renderBadge('言語化あり','gray'):''}</p>
                       <p class="text-xs text-zinc-400 font-bold mt-1">最終: ${new Date(u.lastActiveAt).toLocaleString()}</p>
                     </div>
                   </div>
                   <div class="text-right shrink-0 ml-4">
-                    <p class="text-2xl font-black">${prog}%</p>
+                    <p class="text-2xl font-black">${u.progress}%</p>
                     <p class="text-xs font-bold text-zinc-400">稼働 ${u.workDays||0}日</p>
                   </div>
-                </div>`;
-            }).join('');
+                </div>`).join('');
 
             return `
             <div class="space-y-8 animate-in">
@@ -492,17 +592,25 @@
                  <div><h2 class="text-3xl md:text-4xl font-black tracking-tight">組織進捗</h2><p class="text-sm text-zinc-500 font-bold uppercase tracking-wider mt-1">Global Dashboard</p></div>
                  ${totalPending>0 ? `<div class="bg-amber-50 text-amber-700 px-5 py-3 rounded-xl text-sm font-black border border-amber-200 flex items-center gap-2 shadow-sm">${icon('messageSquare',18)} 未承認の言語化が ${totalPending} 件</div>`:''}
               </div>
-              <div class="grid grid-cols-1 md-grid-cols-2 gap-6">
+              <div class="grid grid-cols-1 md-grid-cols-3 gap-6">
                 <div class="bg-white p-8 rounded-3xl border border-zinc-200 shadow-sm flex justify-between items-center">
                   <div><p class="text-xs text-zinc-400 font-black uppercase tracking-widest mb-2">Active Newbies</p><p class="text-5xl font-black">${users.length}<span class="text-lg text-zinc-400 ml-1">名</span></p></div>
                   <div class="w-16 h-16 bg-zinc-100 rounded-2xl flex items-center justify-center text-zinc-900">${icon('users',32)}</div>
                 </div>
                 <div class="bg-white p-8 rounded-3xl border border-zinc-200 shadow-sm flex justify-between items-center">
-                  <div><p class="text-xs text-zinc-400 font-black uppercase tracking-widest mb-2">Alerts (3d inactive)</p><p class="text-5xl font-black text-red-600">${users.filter(u=>(Date.now()-(u.lastActiveAt||u.createdAt))>259200000).length}<span class="text-lg ml-1">名</span></p></div>
+                  <div><p class="text-xs text-zinc-400 font-black uppercase tracking-widest mb-2">Alerts (3d inactive)</p><p class="text-5xl font-black text-red-600">${analyzedUsers.filter(u=>u.isInactive).length}<span class="text-lg ml-1">名</span></p></div>
                   <div class="w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center text-red-600">${icon('alertCircle',32)}</div>
                 </div>
               </div>
+
               <div class="bg-white border border-zinc-200 rounded-3xl overflow-hidden shadow-sm">
+                 <div class="bg-zinc-50 px-6 py-4 border-b border-zinc-200 flex gap-3 overflow-x-auto">
+                    <button data-action="set-filter" data-filter="all" class="px-5 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition-all ${state.filter==='all' ? 'bg-zinc-900 text-white shadow-md' : 'bg-zinc-50 text-zinc-600 hover:bg-zinc-100 border border-zinc-200'}">すべて</button>
+                    <button data-action="set-filter" data-filter="action_required" class="px-5 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition-all flex items-center gap-2 ${state.filter==='action_required' ? 'bg-zinc-900 text-white shadow-md' : 'bg-zinc-50 text-zinc-600 hover:bg-zinc-100 border border-zinc-200'}">
+                        ${totalPending > 0 ? `<span class="w-2 h-2 rounded-full ${state.filter==='action_required' ? 'bg-white' : 'bg-zinc-900'}"></span>` : ''} 確認待ち (${analyzedUsers.filter(u=>u.pendingTexts>0).length})
+                    </button>
+                    <button data-action="set-filter" data-filter="inactive" class="px-5 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition-all ${state.filter==='inactive' ? 'bg-red-600 text-white shadow-md' : 'bg-red-50 text-red-600 hover:bg-red-100 border border-red-200'}">放置警告 (${analyzedUsers.filter(u=>u.isInactive).length})</button>
+                 </div>
                  <div class="bg-zinc-50 px-6 py-4 border-b border-zinc-200 text-xs font-black text-zinc-500 uppercase tracking-widest flex justify-between"><span>新人一覧</span><span>進捗率</span></div>
                  ${userHtml}
               </div>
@@ -511,6 +619,7 @@
 
         function renderUserDashboard() {
             const u = state.currentUser;
+            if(!u) return '';
             const cCount = state.userTasks.filter(ut => ut.userId === u.id && ut.isCompleted).length;
             const prog = state.tasks.length ? Math.round((cCount / state.tasks.length) * 100) : 0;
             const today = getTodayStr();
@@ -533,11 +642,11 @@
 
             return `
             <div class="space-y-8 animate-in max-w-3xl mx-auto pb-12">
-               <div class="bg-white p-8 md:p-10 rounded-3xl border border-zinc-200 shadow-sm relative overflow-hidden">
+               <div class="bg-white p-8 md-p-10 rounded-3xl border border-zinc-200 shadow-sm relative overflow-hidden">
                  <div class="absolute top-0 right-0 p-6 opacity-5 pointer-events-none">${icon('playCircle', 150)}</div>
                  <p class="text-xs font-black text-zinc-400 uppercase tracking-widest mb-4">Origin Roadmap</p>
-                 <h2 class="text-4xl md:text-5xl font-black mb-6 tracking-tight">${escapeHTML(u.name)}</h2>
-                 <div class="inline-flex items-center gap-3 bg-zinc-50 px-4 py-2.5 rounded-full border border-zinc-200 mb-8 shadow-sm">
+                 <h2 class="text-4xl md-text-5xl font-black mb-6 tracking-tight">${escapeHTML(u.name)}</h2>
+                 <div class="inline-flex items-center gap-3 bg-zinc-50 px-4 py-2 rounded-full border border-zinc-200 mb-8 shadow-sm">
                     <div class="w-8 h-8 rounded-full bg-white border border-zinc-200 flex items-center justify-center text-zinc-900">${icon(rIco, 16)}</div>
                     <span class="text-sm font-black pr-2 text-zinc-800">${rank}</span>
                  </div>
@@ -551,14 +660,14 @@
                     <div class="bg-zinc-50 p-8 rounded-3xl border border-zinc-200 flex flex-col justify-between">
                       <div><p class="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-3">Work Days</p><p class="text-5xl font-black">${u.workDays||0} <span class="text-sm font-bold text-zinc-400">Days</span></p></div>
                       <div class="mt-6 pt-6 border-t border-zinc-200">
-                         ${u.lastWorkDate === today ? `<div class="bg-emerald-50 text-emerald-700 px-4 py-3.5 rounded-xl text-sm font-black border border-emerald-200 flex items-center justify-center gap-2 shadow-sm">${icon('checkCircle',18)} 本日稼働中</div>` : `<button data-action="start-work" class="btn-primary text-sm py-4">本日の稼働を記録する</button>`}
+                         ${u.lastWorkDate === today ? `<div class="bg-emerald-50 text-emerald-700 px-4 py-3 rounded-xl text-sm font-black border border-emerald-200 flex items-center justify-center gap-2 shadow-sm">${icon('checkCircle',18)} 本日稼働中</div>` : `<button data-action="start-work" class="btn-primary text-sm py-4">本日の稼働を記録する</button>`}
                       </div>
                     </div>
                  </div>
                </div>
 
                ${nextTk ? `
-               <div class="bg-zinc-900 p-8 md:p-10 rounded-3xl shadow-xl cursor-pointer transform transition hover:-translate-y-1 relative overflow-hidden group" data-action="select-task" data-tid="${nextTk.id}">
+               <div class="bg-zinc-900 p-8 md-p-10 rounded-3xl shadow-xl cursor-pointer transform transition hover:-translate-y-1 relative overflow-hidden group" data-action="select-task" data-tid="${nextTk.id}">
                   <div class="absolute inset-0 bg-white opacity-0 group-hover:opacity-5 transition-opacity"></div>
                   <span class="bg-white text-zinc-900 text-xs font-black px-4 py-2 rounded-full inline-flex items-center gap-1.5 mb-6 uppercase tracking-widest shadow-sm">${icon('playCircle',14)} Next Action</span>
                   <h3 class="text-3xl font-black text-white mb-8 leading-tight">${escapeHTML(nextTk.title)}</h3>
@@ -588,7 +697,7 @@
                             const ut = state.userTasks.find(x=>x.taskId===t.id && x.userId===u.id);
                             const isC = ut?.isCompleted; const isP = ut && !isC;
                             return `
-                            <div class="p-6 md:px-8 flex items-center justify-between cursor-pointer transition ${isC?'opacity-50 hover:bg-zinc-50':isP?'bg-amber-50/50 hover:bg-amber-50':'hover:bg-zinc-50'}" data-action="select-task" data-tid="${t.id}">
+                            <div class="p-6 md-px-8 flex items-center justify-between cursor-pointer transition ${isC?'opacity-50 hover:bg-zinc-50':isP?'bg-amber-50/50 hover:bg-amber-50':'hover:bg-zinc-50'}" data-action="select-task" data-tid="${t.id}">
                                <div class="flex items-center gap-5 pr-4">
                                   ${isC?icon('checkCircle',28,'text-zinc-900 shrink-0'):`<div class="w-7 h-7 rounded-full border-2 border-zinc-300 shrink-0"></div>`}
                                   <div>
@@ -611,6 +720,7 @@
 
         function renderUserDetail() {
             const u = state.activeTargetUser;
+            if(!u) return '';
             const cCount = state.userTasks.filter(ut => ut.userId === u.id && ut.isCompleted).length;
             const prog = state.tasks.length ? Math.round((cCount / state.tasks.length) * 100) : 0;
             
@@ -668,7 +778,7 @@
                                         <div class="flex flex-col gap-3">
                                           <p class="text-xs font-black text-amber-600 flex items-center gap-1 uppercase tracking-widest">${icon('alertCircle',14)} 確認して完了にする</p>
                                           <div class="flex flex-col md-flex-row gap-3">
-                                            <input type="text" id="feedback_${ut.id}" placeholder="フィードバックを入力(空欄可)..." class="flex-1 font-bold bg-zinc-50" />
+                                            <input type="text" id="feedback_${ut.id}" placeholder="フィードバックを入力(空欄可)..." class="flex-1 font-bold bg-zinc-50 border border-zinc-200" />
                                             <button data-action="approve-task" data-utid="${ut.id}" data-tid="${t.id}" class="bg-zinc-900 text-white px-6 py-3 rounded-xl font-black text-sm shrink-0 shadow-md hover:bg-zinc-800 active:scale-95 transition-all">承認する</button>
                                           </div>
                                         </div>
@@ -749,7 +859,29 @@
                             </div>
                           `}
                         `).join('')}
-                        ${!state.editingTask ? `<button data-action="add-task" data-pid="${p.id}" class="w-full py-5 text-sm font-black text-zinc-400 border-2 border-dashed border-zinc-200 rounded-2xl hover:bg-zinc-50 hover:text-zinc-600 transition-colors flex justify-center items-center gap-2">${icon('edit',18)} 新しいタスクを追加</button>` : ''}
+                        
+                        ${state.newTaskPhaseId === p.id ? `
+                           <div class="border-2 border-zinc-900 bg-zinc-50 p-6 rounded-2xl space-y-5 shadow-md my-4 animate-in">
+                              <p class="text-xs font-black text-zinc-500 uppercase tracking-widest">新規タスク追加</p>
+                              <input type="text" data-model="newTitle" placeholder="タスク名" value="${escapeHTML(state.newTaskData.title)}" class="font-bold text-lg bg-white border border-zinc-200 p-4 rounded-xl" />
+                              <select data-model="newType" class="font-bold text-base bg-white border border-zinc-200 p-4 rounded-xl">
+                                <option value="normal" ${state.newTaskData.type==='normal'?'selected':''}>通常タスク (チェックのみ)</option>
+                                <option value="video" ${state.newTaskData.type==='video'?'selected':''}>動画視聴 (100%再生必須)</option>
+                                <option value="test" ${state.newTaskData.type==='test'?'selected':''}>理解度テスト (自動採点)</option>
+                                <option value="text" ${state.newTaskData.type==='text'?'selected':''}>言語化提出 (管理者承認)</option>
+                                <option value="link" ${state.newTaskData.type==='link'?'selected':''}>リンクタスク (URLへ遷移)</option>
+                              </select>
+                              ${['video','test','link'].includes(state.newTaskData.type) ? `
+                                <textarea data-model="newContent" placeholder="${state.newTaskData.type === 'video' ? '動画URL (例: https://...)' : state.newTaskData.type === 'link' ? '遷移先URL (例: https://forms.gle/...)' : 'テストJSONデータ'}" class="font-mono text-sm h-32 bg-white border border-zinc-200 p-4 rounded-xl leading-relaxed">${escapeHTML(state.newTaskData.content)}</textarea>
+                              ` : ''}
+                              <div class="flex gap-3 pt-2">
+                                <button data-action="submit-new-task" class="flex-1 bg-zinc-900 text-white py-4 rounded-xl font-black text-sm shadow-md active:scale-95 transition-all">追加する</button>
+                                <button data-action="cancel-new-task" class="flex-1 bg-white border border-zinc-200 font-black text-sm text-zinc-700 rounded-xl hover:bg-zinc-100 transition-colors">キャンセル</button>
+                              </div>
+                           </div>
+                        ` : `
+                           ${!state.editingTask ? `<button data-action="open-new-task" data-pid="${p.id}" class="w-full py-5 text-sm font-black text-zinc-400 border-2 border-dashed border-zinc-200 rounded-2xl hover:bg-zinc-50 hover:text-zinc-600 transition-colors flex justify-center items-center gap-2">${icon('edit',18)} 新しいタスクを追加</button>` : ''}
+                        `}
                       </div>
                    </div>
                  `).join('')}
@@ -757,12 +889,18 @@
                     <input type="text" id="newPhaseName" placeholder="新しいフェーズの名前" value="${escapeHTML(state.newPhaseName)}" class="flex-1 bg-zinc-50 font-bold text-lg p-5 rounded-2xl border border-zinc-200"/>
                     <button data-action="add-phase" class="w-full md-w-auto bg-zinc-900 text-white px-10 py-5 rounded-2xl font-black shadow-md active:scale-95 transition-transform">追加</button>
                  </div>
+                 ${state.phases.length > 0 ? `
+                   <div class="text-center pt-8">
+                     <button data-action="append-seed-data" class="text-zinc-400 font-bold text-sm underline hover:text-zinc-900 transition-colors">提供されたリスト(全39タスク)を追加で一括生成する</button>
+                   </div>
+                 ` : ''}
               </div>
             </div>`;
         }
 
         function renderTaskExec() {
             const t = state.activeTask;
+            if(!t) return '';
             const u = state.currentUser;
             const ut = state.userTasks.find(x=>x.taskId===t.id && x.userId===u.id);
             const isC = ut?.isCompleted;
@@ -877,7 +1015,7 @@
             return `
             <div class="max-w-3xl mx-auto space-y-8 animate-in pb-16">
                <button data-action="nav" data-view="dashboard" class="text-zinc-500 font-black text-sm flex items-center gap-2 hover:text-zinc-900 transition-colors">${icon('chevronRight',20,'rotate-180')} 戻る</button>
-               <div class="bg-white p-10 md:p-14 rounded-[3rem] shadow-sm border border-zinc-200">
+               <div class="bg-white p-10 md-p-14 rounded-[3rem] shadow-sm border border-zinc-200">
                   ${renderBadge(t.type, 'amber')}
                   <h2 class="text-4xl font-black mt-6 mb-8 tracking-tighter leading-tight">${escapeHTML(t.title)}</h2>
                   ${contentHtml}
@@ -945,14 +1083,25 @@
         // 6. メインレンダーと初期化
         // ==========================================
         function render() {
-            const appRoot = document.getElementById('app');
-            if (state.currentUser) {
-                appRoot.innerHTML = renderMainApp();
-            } else {
-                appRoot.innerHTML = renderAuth();
+            try {
+                const appRoot = document.getElementById('app');
+                if (state.currentUser) {
+                    appRoot.innerHTML = renderMainApp();
+                } else {
+                    appRoot.innerHTML = renderAuth();
+                }
+                renderModal();
+                setTimeout(setupVideoPlayer, 0);
+            } catch(e) {
+                console.error("Rendering error:", e);
+                document.getElementById('app').innerHTML = `
+                  <div style="padding: 2rem; text-align: center;">
+                    <h2 style="color: red; font-weight: bold; margin-bottom: 1rem;">表示エラーが発生しました</h2>
+                    <p>ブラウザのキャッシュを削除するか、シークレットモードでお試しください。</p>
+                    <button onclick="localStorage.clear(); window.location.reload();" style="margin-top: 1rem; padding: 10px 20px; background: #18181b; color: white; border-radius: 8px;">データをリセットして再起動</button>
+                  </div>
+                `;
             }
-            renderModal();
-            setTimeout(setupVideoPlayer, 0);
         }
 
         function init() {
@@ -974,6 +1123,8 @@
             if(el.id === 'newSecretKeyInput') state.newSecretKey = el.value;
             if(el.dataset.model === 'editTitle') state.editTaskData.title = el.value;
             if(el.dataset.model === 'editContent') state.editTaskData.content = el.value;
+            if(el.dataset.model === 'newTitle') state.newTaskData.title = el.value;
+            if(el.dataset.model === 'newContent') state.newTaskData.content = el.value;
         }
 
         function handleGlobalChange(e) {
@@ -999,6 +1150,10 @@
             }
             if(el.dataset.model === 'editType') {
                 state.editTaskData.type = el.value;
+                render();
+            }
+            if(el.dataset.model === 'newType') {
+                state.newTaskData.type = el.value;
                 render();
             }
         }
@@ -1058,6 +1213,7 @@
             if (action === 'reload') { window.location.reload(); }
 
             // Admin Dashboard
+            if (action === 'set-filter') { state.filter = btn.dataset.filter; render(); }
             if (action === 'select-user') {
                 state.activeTargetUser = state.profiles.find(p=>p.id===btn.dataset.uid);
                 state.view = 'userDetail'; render();
@@ -1111,6 +1267,11 @@
 
             // Manage
             if (action === 'seed-data') seedData();
+            if (action === 'append-seed-data') {
+                showConfirm("提供されたロードマップ（全39タスク）を追加で一括生成しますか？", () => {
+                    seedData(true);
+                });
+            }
             if (action === 'reset-seed-data') {
                 showConfirm("現在のタスクを全て削除し、全39タスクに初期化しますか？\n※ユーザーの進捗は保持されます。", () => {
                     state.phases = []; state.tasks = [];
@@ -1137,9 +1298,33 @@
                     render();
                 });
             }
-            if (action === 'add-task') {
-                state.tasks.push({ id: genId(), phaseId: btn.dataset.pid, title: '新規タスク', type: 'normal', content: '', order: state.tasks.length+1 });
-                save('origin_tasks', state.tasks); render();
+            if (action === 'open-new-task') {
+                state.newTaskPhaseId = btn.dataset.pid;
+                state.newTaskData = { title: '', type: 'normal', content: '' };
+                render();
+            }
+            if (action === 'cancel-new-task') {
+                state.newTaskPhaseId = null;
+                render();
+            }
+            if (action === 'submit-new-task') {
+                if(!state.newTaskData.title) {
+                    showAlert("タスク名を入力してください");
+                    return;
+                }
+                const pTasks = state.tasks.filter(t => t.phaseId === state.newTaskPhaseId);
+                const maxOrder = pTasks.length > 0 ? Math.max(...pTasks.map(t => t.order)) : 0;
+                state.tasks.push({
+                    id: genId(),
+                    phaseId: state.newTaskPhaseId,
+                    title: state.newTaskData.title,
+                    type: state.newTaskData.type,
+                    content: state.newTaskData.content,
+                    order: maxOrder + 1
+                });
+                save('origin_tasks', state.tasks);
+                state.newTaskPhaseId = null;
+                render();
             }
             if (action === 'delete-task') {
                 showConfirm(`タスク「${btn.dataset.title}」を削除しますか？`, () => {
@@ -1179,11 +1364,6 @@
                 if (!isCompleted) completeTask(state.activeTask.id, { completionRate: 100 });
             });
         }
-
-        // ==========================================
-        // 起動
-        // ==========================================
-        init();
 
     </script>
 </body>
